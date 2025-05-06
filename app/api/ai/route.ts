@@ -51,15 +51,29 @@ export async function POST(req: NextRequest) {
     // Get request origin
     const origin = req.headers.get("origin") || "";
     
-    // Restrict to specific origins
-    const allowedOrigins = ["https://bloomberg-terminal-nine.vercel.app"];
+    // Get allowed origins from environment variable
+    // Format: comma-separated list of domains (e.g., "https://domain1.com,https://domain2.com")
+    const allowedOriginsEnv = process.env.ALLOWED_ORIGINS || "";
+    const allowedOrigins = allowedOriginsEnv
+      .split(",")
+      .map(origin => origin.trim())
+      .filter(Boolean);
     
-    // In development, also allow localhost origins
-    if (process.env.NODE_ENV === "development") {
+    // Always allow production URL if specified
+    if (process.env.VERCEL_URL) {
+      const vercelUrl = `https://${process.env.VERCEL_URL}`;
+      if (!allowedOrigins.includes(vercelUrl)) {
+        allowedOrigins.push(vercelUrl);
+      }
+    }
+    
+    // In development, also allow localhost origins if no origins are specified
+    if (process.env.NODE_ENV === "development" && allowedOrigins.length === 0) {
       allowedOrigins.push("http://localhost:3000");
     }
     
-    if (!allowedOrigins.includes(origin)) {
+    // Skip origin check if no allowed origins are specified (not recommended for production)
+    if (allowedOrigins.length > 0 && !allowedOrigins.includes(origin)) {
       return new Response(
         JSON.stringify({ error: "Unauthorized origin" }),
         { status: 403, headers: { "Content-Type": "application/json" } }

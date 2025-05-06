@@ -35,9 +35,18 @@ Clone of the Bloomberg Terminal built with Next.js 15, React 19, and TypeScript.
 Create a `.env.local` file with the following variables:
 
 ```
+# Upstash Redis connection details
 UPSTASH_REDIS_REST_URL=your_upstash_redis_url
 UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
+
+# Alpha Vantage API key for market data
 ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key
+
+# OpenAI API key for AI features
+OPENAI_API_KEY=your_openai_api_key
+
+# Allowed origins for API access (comma-separated list, no spaces)
+ALLOWED_ORIGINS=https://your-domain.com,http://localhost:3000
 ```
 
 ## Project Structure
@@ -80,6 +89,14 @@ Components are organized based on:
 - Optimized update cycles to reduce API calls
 - Memoization of expensive calculations
 - Conditional rendering for performance-critical components
+
+## Security Features
+
+- **Origin Restriction**: API endpoints are restricted to specific domains configured via the `ALLOWED_ORIGINS` environment variable
+- **Rate Limiting**: Prevents abuse by limiting requests per IP address
+- **Input Validation**: All API inputs are validated and sanitized using Zod schemas
+- **Response Limiting**: AI responses are limited in token count to prevent excessive usage
+- **Environment Variables**: Sensitive keys are stored in environment variables and not exposed to the client
 
 ## License
 
