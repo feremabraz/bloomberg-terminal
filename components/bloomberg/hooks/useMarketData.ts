@@ -147,7 +147,7 @@ export function useRegionMarketData(regions: string[] = ["americas", "emea", "as
     const dataArray = regionsQueries.data;
     
     regions.forEach((region, index) => {
-      if (dataArray && dataArray[index]) {
+      if (dataArray?.[index]) {
         result[region] = dataArray[index];
       }
     });
