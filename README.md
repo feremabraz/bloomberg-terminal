@@ -2,6 +2,8 @@
 
 Clone of the Bloomberg Terminal built with Next.js 15, React 19, and TypeScript. This project demonstrates real-time financial data visualization with a professional interface inspired by the Bloomberg Terminal. Structured as an SPA because for a terminal with constantly mutating financial data, URL structure and browser history have limited utility compared to a traditional SPA approach.
 
+![Preview](README.png)
+
 ## Features
 
 - **Real-time Market Data**: Simulated market updates with configurable refresh rates
