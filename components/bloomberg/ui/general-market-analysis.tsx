@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChat } from "@ai-sdk/react";
 import { RefreshCw, Send, X } from "lucide-react";
-import { useState } from "react";
 import { BloombergButton } from "../core/bloomberg-button";
 import type { MarketData } from "../types";
 
@@ -141,40 +140,6 @@ export function GeneralMarketAnalysis({ marketData, colors }: GeneralMarketAnaly
           </BloombergButton>
         </form>
       </div>
-
-      {/* Conversation History */}
-      {messages.length > 1 && (
-        <div
-          className="p-3 border rounded-sm text-xs max-h-[200px] overflow-y-auto"
-          style={{
-            borderColor: colors.border,
-            backgroundColor: colors.background,
-          }}
-        >
-          {messages.map(
-            (message) =>
-              message.role !== "system" && (
-                <div key={message.id} className="mb-2 last:mb-0">
-                  <p
-                    className="font-bold text-xs mb-1"
-                    style={{
-                      color: message.role === "user" ? colors.accent : colors.text,
-                    }}
-                  >
-                    {message.role === "user" ? "You" : "AI Assistant"}:
-                  </p>
-                  <p className="text-xs whitespace-pre-line pl-2">{message.content}</p>
-                </div>
-              )
-          )}
-          {isLoading && (
-            <div className="mt-2">
-              <Skeleton className="h-4 w-full mb-1" />
-              <Skeleton className="h-4 w-3/4" />
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
