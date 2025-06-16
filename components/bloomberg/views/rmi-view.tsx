@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAtom } from "jotai";
 import { ArrowLeft } from "lucide-react";
+import { useEffect } from "react";
 import {
   currentViewAtom,
   isDarkModeAtom,
@@ -38,6 +39,37 @@ export function RmiView() {
   const [selectedSecurity, setSelectedSecurity] = useAtom(rmiSelectedSecurityAtom);
   const [benchmarkIndex, setBenchmarkIndex] = useAtom(rmiBenchmarkIndexAtom);
   const [timeRange, setTimeRange] = useAtom(rmiTimeRangeAtom);
+
+  // Get all available securities for the selected region
+  const securities: MarketItem[] = marketData[selectedRegion] || [];
+
+  useEffect(() => {
+    const availableBenchmarks = securities.filter((item) => item.id !== selectedSecurity);
+
+    if (availableBenchmarks.length === 0) {
+      // No valid benchmarks to select (e.g., only one security in total)
+      if (benchmarkIndex !== undefined) {
+        // only update if it needs to be cleared
+        setBenchmarkIndex(undefined);
+      }
+      return;
+    }
+
+    const currentBenchmarkIsValid = availableBenchmarks.some((item) => item.id === benchmarkIndex);
+
+    if (!currentBenchmarkIsValid) {
+      // Current benchmark is not valid (either undefined or same as selectedSecurity)
+      // Try to set SPX:IND if it's available
+      const spxBenchmark = availableBenchmarks.find((item) => item.id === "SPX:IND");
+      if (spxBenchmark) {
+        setBenchmarkIndex(spxBenchmark.id);
+      } else {
+        // Otherwise, set the first available benchmark
+        setBenchmarkIndex(availableBenchmarks[0].id);
+      }
+    }
+    // If currentBenchmarkIsValid is true, benchmarkIndex is already fine.
+  }, [selectedSecurity, securities, benchmarkIndex, setBenchmarkIndex]);
 
   // Handle back button click
   const handleBack = () => {
@@ -70,8 +102,6 @@ export function RmiView() {
   }
 
   // Get all available securities for the selected region
-  const securities: MarketItem[] = marketData[selectedRegion] || [];
-
   // If no security is selected yet, select the first one
   if (!selectedSecurity && securities.length > 0) {
     setSelectedSecurity(securities[0].id);
@@ -79,11 +109,7 @@ export function RmiView() {
 
   // Find the selected security and benchmark
   const selectedSecurityData = securities.find((item: MarketItem) => item.id === selectedSecurity);
-  const benchmarkData =
-    securities.find((item: MarketItem) => item.id === benchmarkIndex) ||
-    // Default to S&P 500 or first item if not found
-    securities.find((item: MarketItem) => item.id === "SPX:IND") ||
-    securities[0];
+  const benchmarkData = securities.find((item: MarketItem) => item.id === benchmarkIndex);
 
   return (
     <div className="p-4" style={{ backgroundColor: colors.background, color: colors.text }}>
@@ -209,15 +235,17 @@ export function RmiView() {
                   color: colors.text,
                 }}
               >
-                {securities.map((item: MarketItem) => (
-                  <SelectItem
-                    key={item.id}
-                    value={item.id}
-                    className="rounded-none focus:bg-[#333333] focus:text-white"
-                  >
-                    {item.id}
-                  </SelectItem>
-                ))}
+                {securities
+                  .filter((item: MarketItem) => item.id !== selectedSecurity)
+                  .map((item: MarketItem) => (
+                    <SelectItem
+                      key={item.id}
+                      value={item.id}
+                      className="rounded-none focus:bg-[#333333] focus:text-white"
+                    >
+                      {item.id}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -267,7 +295,7 @@ export function RmiView() {
           {selectedSecurityData && (
             <RmiChart
               marketItem={selectedSecurityData}
-              benchmarkItem={benchmarkData}
+              benchmarkItem={benchmarkData ?? undefined}
               height={400}
             />
           )}
@@ -324,25 +352,26 @@ export function RmiView() {
                   <tbody>
                     <tr>
                       <td className="py-1 font-medium">ID:</td>
-                      <td>{benchmarkData.id}</td>
+                      <td>{benchmarkData?.id}</td>
                     </tr>
                     <tr>
                       <td className="py-1 font-medium">Value:</td>
-                      <td>{benchmarkData.value.toFixed(2)}</td>
+                      <td>{benchmarkData?.value?.toFixed(2)}</td>
                     </tr>
                     <tr>
                       <td className="py-1 font-medium">Change:</td>
                       <td
                         style={{
-                          color: benchmarkData.change >= 0 ? colors.positive : colors.negative,
+                          color: benchmarkData?.change >= 0 ? colors.positive : colors.negative,
                         }}
                       >
-                        {benchmarkData.change.toFixed(2)} ({benchmarkData.pctChange.toFixed(2)}%)
+                        {benchmarkData?.change?.toFixed(2)} ({benchmarkData?.pctChange?.toFixed(2)}
+                        %)
                       </td>
                     </tr>
                     <tr>
                       <td className="py-1 font-medium">YTD:</td>
-                      <td>{benchmarkData.ytd.toFixed(2)}%</td>
+                      <td>{benchmarkData?.ytd?.toFixed(2)}%</td>
                     </tr>
                   </tbody>
                 </table>
@@ -358,7 +387,8 @@ export function RmiView() {
           >
             <h3 className="text-sm font-bold mb-2">RMI Historical Data</h3>
             <p className="text-xs mb-4">
-              Historical RMI values comparing {selectedSecurityData?.id} to {benchmarkData?.id}
+              Historical RMI values comparing {selectedSecurityData?.id} to{" "}
+              {benchmarkData?.id ?? "N/A"}
             </p>
 
             <table className="w-full text-xs">
@@ -366,7 +396,7 @@ export function RmiView() {
                 <tr className="border-b" style={{ borderColor: colors.border }}>
                   <th className="py-2 text-left">Date</th>
                   <th className="py-2 text-right">{selectedSecurityData?.id}</th>
-                  <th className="py-2 text-right">{benchmarkData?.id}</th>
+                  <th className="py-2 text-right">{benchmarkData?.id ?? "BENCHMARK"}</th>
                   <th className="py-2 text-right">RMI</th>
                   <th className="py-2 text-right">Change</th>
                 </tr>
@@ -385,7 +415,7 @@ export function RmiView() {
                   const secValue = selectedSecurityData
                     ? (selectedSecurityData.value * (1 - i * 0.005)).toFixed(2)
                     : "0.00";
-                  const benchValue = benchmarkData
+                  const benchValue = benchmarkData?.value
                     ? (benchmarkData.value * (1 - i * 0.003)).toFixed(2)
                     : "0.00";
                   const rmi = (100 * (1 + i * 0.002)).toFixed(2);
@@ -451,7 +481,7 @@ export function RmiView() {
               </li>
               <li>
                 Year-to-date performance shows{" "}
-                {selectedSecurityData?.ytd || 0 > benchmarkData?.ytd || 0
+                {(selectedSecurityData?.ytd ?? 0) > (benchmarkData?.ytd ?? 0)
                   ? "stronger returns"
                   : "weaker returns"}{" "}
                 compared to the benchmark.
