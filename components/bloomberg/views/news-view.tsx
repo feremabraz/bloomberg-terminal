@@ -37,20 +37,14 @@ export default function NewsView({ isDarkMode, onBack }: NewsViewProps) {
       try {
         setIsLoading(true);
         setError(null);
-
         const newsData = await fetchFinancialNews(query);
-
         if (newsData) {
           setNews(newsData);
         } else {
-          // If no data, use fallback
-          setNews(generateFallbackNews());
           setError("Could not fetch real news data. Showing sample news.");
         }
       } catch (err) {
-        console.error("Error fetching news:", err);
         setError("Failed to fetch news");
-        setNews(generateFallbackNews());
       } finally {
         setIsLoading(false);
       }
@@ -58,64 +52,11 @@ export default function NewsView({ isDarkMode, onBack }: NewsViewProps) {
     [searchTerm]
   );
 
-  // Generate fallback news data
-  const generateFallbackNews = (): NewsItem[] => {
-    return [
-      {
-        title: "Markets React to Federal Reserve Decision",
-        summary:
-          "Global markets showed mixed reactions to the Federal Reserve's latest interest rate decision, with tech stocks leading gains while financial sector shares declined.",
-        url: "#",
-        time_published: new Date().toISOString(),
-        source: "Financial Times",
-        source_domain: "ft.com",
-      },
-      {
-        title: "S&P 500 Reaches New All-Time High",
-        summary:
-          "The S&P 500 index reached a new record high today, driven by strong earnings reports from major technology companies and positive economic data.",
-        url: "#",
-        time_published: new Date(Date.now() - 3600000).toISOString(),
-        source: "Wall Street Journal",
-        source_domain: "wsj.com",
-      },
-      {
-        title: "Oil Prices Fall on Supply Concerns",
-        summary:
-          "Crude oil prices dropped by 2% following reports of increased production from major oil-producing countries, raising concerns about oversupply in the global market.",
-        url: "#",
-        time_published: new Date(Date.now() - 7200000).toISOString(),
-        source: "Bloomberg",
-        source_domain: "bloomberg.com",
-      },
-      {
-        title: "Tech Sector Leads Market Rally",
-        summary:
-          "Technology stocks led a broad market rally as investors responded positively to better-than-expected earnings reports from several major tech companies.",
-        url: "#",
-        time_published: new Date(Date.now() - 10800000).toISOString(),
-        source: "CNBC",
-        source_domain: "cnbc.com",
-      },
-      {
-        title: "European Markets Close Higher on Economic Data",
-        summary:
-          "European stock indices closed higher following the release of positive economic indicators, suggesting a stronger-than-expected recovery in the eurozone.",
-        url: "#",
-        time_published: new Date(Date.now() - 14400000).toISOString(),
-        source: "Reuters",
-        source_domain: "reuters.com",
-      },
-    ];
-  };
-
-  // Format the published time
   const formatPublishedTime = (timeString: string) => {
     // The Alpha Vantage API returns dates in YYYYMMDDTHHMMSS format.
     // We need to parse this custom format, as new Date() cannot handle it directly.
     const alphaVantageFormat = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})$/;
     const match = timeString.match(alphaVantageFormat);
-
     let date: Date;
     if (match) {
       // If it matches the Alpha Vantage format, parse it manually.
@@ -130,15 +71,13 @@ export default function NewsView({ isDarkMode, onBack }: NewsViewProps) {
         Number(second)
       );
     } else {
-      // Otherwise, assume it's a standard format (like the ISO 8601 string from our fallback data).
+      // Otherwise, assume it's a standard format.
       date = new Date(timeString);
     }
-
     // Check if the resulting date is valid before formatting.
     if (Number.isNaN(date.getTime())) {
       return "Invalid Date";
     }
-
     return date.toLocaleString();
   };
 
@@ -175,7 +114,6 @@ export default function NewsView({ isDarkMode, onBack }: NewsViewProps) {
         {error && (
           <div className={`mb-4 p-2 bg-[${colors.negative}] text-white text-xs`}>{error}</div>
         )}
-
         {news.length === 0 && !isLoading ? (
           <div className="text-center py-8">No news articles found</div>
         ) : (

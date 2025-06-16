@@ -37,7 +37,7 @@ export function MarketRow({
   updatedCells,
   updatedSparklines,
 }: MarketRowProps) {
-  // Use Jotai atoms for filter state
+  // Jotai atoms for filter state
   const [filters] = useAtom(filtersAtom);
   const [showCAD] = useAtom(showCADAtom);
   const [showYTD] = useAtom(showYTDAtom);
@@ -47,14 +47,11 @@ export function MarketRow({
   const [showVolatility] = useAtom(showVolatilityAtom);
   const [showRatios] = useAtom(showRatiosAtom);
   const [showFutures] = useAtom(showFuturesAtom);
-
-  // Use Jotai atoms for navigation
+  // Jotai atoms for navigation
   const [, setCurrentView] = useAtom(currentViewAtom);
   const [, setSelectedRegion] = useAtom(rmiSelectedRegionAtom);
   const [, setSelectedSecurity] = useAtom(rmiSelectedSecurityAtom);
   const [, setBenchmarkIndex] = useAtom(rmiBenchmarkIndexAtom);
-
-  // Note: Filtering is now handled at the section level in market-section.tsx
 
   const colors = isDarkMode ? bloombergColors.dark : bloombergColors.light;
   const fixedColumnClass = "w-[120px] sm:w-[140px] whitespace-nowrap overflow-hidden text-ellipsis";
@@ -69,11 +66,9 @@ export function MarketRow({
     } else if (region === "asiapacific") {
       setSelectedRegion("asiaPacific");
     }
-
     // Set the selected security and default benchmark
     setSelectedSecurity(item.id);
     setBenchmarkIndex("SPX:IND"); // Default benchmark
-
     // Navigate to RMI view
     setCurrentView("rmi");
   };

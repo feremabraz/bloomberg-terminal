@@ -25,7 +25,7 @@ export function MarketSection({
   updatedCells,
   updatedSparklines,
 }: MarketSectionProps) {
-  // Use Jotai atoms for filter state
+  // Jotai atoms for filter state
   const [showMovers] = useAtom(showMoversAtom);
   const [showVolatility] = useAtom(showVolatilityAtom);
   const [showRatios] = useAtom(showRatiosAtom);
@@ -39,19 +39,19 @@ export function MarketSection({
   let filteredItems = [...items];
 
   // Only show movers if the filter is active
-  // Consider an item a "mover" if its percentage change is significant (> 1% or < -1%)
+  // We consider an item a "mover" if its percentage change is significant (> 1% or < -1%)
   if (showMovers) {
     filteredItems = filteredItems.filter((item) => Math.abs(item.pctChange) > 1.0);
   }
 
   // Only show items with significant volatility if the filter is active
-  // Consider an item volatile if its AVAT value is high (> 10 or < -10)
+  // We consider an item volatile if its AVAT value is high (> 10 or < -10)
   if (showVolatility) {
     filteredItems = filteredItems.filter((item) => Math.abs(item.avat) > 10.0);
   }
 
   // Only show ratio items if the filter is active
-  // For this demo, let's consider specific market indices as "ratio" items
+  // We consider specific market indices as "ratio" items
   if (showRatios) {
     filteredItems = filteredItems.filter(
       (item) =>
@@ -63,7 +63,7 @@ export function MarketSection({
   }
 
   // Only show futures if the filter is active
-  // For this demo, let's consider specific market items as "futures"
+  // We consider specific market items as "futures"
   if (showFutures) {
     filteredItems = filteredItems.filter(
       (item) =>
@@ -129,7 +129,6 @@ export function MarketSection({
         </TableCell>
         <TableCell colSpan={9} />
       </TableRow>
-
       {filteredItems.map((item, index) => (
         <MarketRow
           key={`${item.id}-${index}`}

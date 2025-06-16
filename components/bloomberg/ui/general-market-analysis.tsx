@@ -51,7 +51,6 @@ export function GeneralMarketAnalysis({ marketData, colors }: GeneralMarketAnaly
     ]);
   };
 
-  // Clear conversation
   const clearChat = () => {
     setMessages([]);
   };

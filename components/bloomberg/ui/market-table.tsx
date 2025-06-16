@@ -28,7 +28,7 @@ export function MarketTable({ data, isDarkMode }: MarketTableProps) {
   const [showAvat] = useAtom(showAvatAtom);
   const colors = isDarkMode ? bloombergColors.dark : bloombergColors.light;
 
-  // Add safety check for data
+  // Safety check for data
   if (!data) {
     return (
       <div className="p-4 text-center">

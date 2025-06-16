@@ -16,7 +16,7 @@ type SparklineCellProps = {
 };
 
 export function SparklineCell({ item, region, isDarkMode, isHighlighted }: SparklineCellProps) {
-  // Use Jotai atom for 10D filter state
+  // Jotai atom for 10D filter state
   const [show10D] = useAtom(show10DAtom);
   const colors = isDarkMode ? bloombergColors.dark : bloombergColors.light;
 

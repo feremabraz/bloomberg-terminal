@@ -36,10 +36,10 @@ export function RmiChart({ marketItem, benchmarkItem, width = 600, height = 300 
   const colors = isDarkMode ? bloombergColors.dark : bloombergColors.light;
   const [hoveredData, setHoveredData] = useState<RmiDataPoint | null>(null);
 
-  // In a real implementation, this would fetch historical data based on the timeRange
-  // For this demo, we'll generate sample data based on the sparkline data
+  // This would fetch historical data based on the timeRange
+  // We'll generate sample data based on the sparkline data
   const generateRmiData = (): RmiDataPoint[] => {
-    // Use sparkline data if available, otherwise generate sample data
+    // We use sparkline data if available, otherwise generate sample data
     const marketValues = marketItem.sparkline1 || [
       marketItem.value * 0.95,
       marketItem.value * 0.97,
