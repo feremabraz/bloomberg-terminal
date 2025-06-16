@@ -24,13 +24,13 @@ export function convertToCAD(usdValue: number): number {
  */
 export function getCurrencySymbol(currencyCode: string): string {
   const symbols: Record<string, string> = {
-    USD: '$',
-    CAD: 'C$',
-    EUR: '€',
-    GBP: '£',
-    JPY: '¥',
+    USD: "$",
+    CAD: "C$",
+    EUR: "€",
+    GBP: "£",
+    JPY: "¥",
   };
-  
+
   return symbols[currencyCode] || currencyCode;
 }
 
@@ -41,7 +41,7 @@ export function getCurrencySymbol(currencyCode: string): string {
  * @param decimals Number of decimal places
  * @returns Formatted currency string
  */
-export function formatCurrency(value: number, currencyCode = 'USD', decimals = 2): string {
+export function formatCurrency(value: number, currencyCode = "USD", decimals = 2): string {
   const symbol = getCurrencySymbol(currencyCode);
   return `${symbol}${value.toFixed(decimals)}`;
 }

@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# This hook is called by git before the commit message editor is started
+# You can use this to add templates or context to commit messages
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+# Only add template for regular commits (not merges, amends, etc.)
+if [ -z "$COMMIT_SOURCE" ]; then
+  # Check if we're in a specific package directory
+  if [ -f "package.json" ] && [ ! -f "pnpm-workspace.yaml" ]; then
+    # We're in a package directory, suggest adding scope
+    PACKAGE_NAME=$(node -p "require('./package.json').name" 2>/dev/null || echo "unknown")
+    if [ "$PACKAGE_NAME" != "unknown" ]; then
+      echo "# Suggested format: type($PACKAGE_NAME): description" >> "$COMMIT_MSG_FILE"
+      echo "#" >> "$COMMIT_MSG_FILE"
+    fi
+  fi
+  
+  echo "# Conventional commit types:" >> "$COMMIT_MSG_FILE"
+  echo "# feat: new feature" >> "$COMMIT_MSG_FILE"
+  echo "# fix: bug fix" >> "$COMMIT_MSG_FILE"
+  echo "# docs: documentation" >> "$COMMIT_MSG_FILE"
+  echo "# style: formatting" >> "$COMMIT_MSG_FILE"
+  echo "# refactor: code refactoring" >> "$COMMIT_MSG_FILE"
+  echo "# test: add tests" >> "$COMMIT_MSG_FILE"
+  echo "# chore: maintenance" >> "$COMMIT_MSG_FILE"
+fi

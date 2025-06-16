@@ -7,21 +7,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
 import { useAtom } from "jotai";
-import { BloombergButton } from "../core/bloomberg-button";
-import { bloombergColors } from "../lib/theme-config";
+import { ChevronDown } from "lucide-react";
 import {
-  showMoversAtom,
-  showVolatilityAtom,
-  showRatiosAtom,
-  showFuturesAtom,
-  showAvatAtom,
   show10DAtom,
+  showAvatAtom,
+  showCADAtom,
+  showFuturesAtom,
+  showMoversAtom,
+  showRatiosAtom,
+  showVolatilityAtom,
   showYTDAtom,
-  showCADAtom
 } from "../atoms";
 import { activeWatchlistAtom } from "../atoms/terminal-ui";
+import { BloombergButton } from "../core/bloomberg-button";
+import { bloombergColors } from "../lib/theme-config";
 import type { FilterState } from "../types";
 
 type TerminalFilterBarProps = {
@@ -29,12 +29,9 @@ type TerminalFilterBarProps = {
   watchlists: Array<{ name: string; indices: string[] }>;
 };
 
-export function TerminalFilterBar({
-  isDarkMode,
-  watchlists,
-}: TerminalFilterBarProps) {
+export function TerminalFilterBar({ isDarkMode, watchlists }: TerminalFilterBarProps) {
   const colors = isDarkMode ? bloombergColors.dark : bloombergColors.light;
-  
+
   // Use Jotai atoms directly for state management
   const [showMovers, setShowMovers] = useAtom(showMoversAtom);
   const [showVolatility, setShowVolatility] = useAtom(showVolatilityAtom);
@@ -117,10 +114,7 @@ export function TerminalFilterBar({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <BloombergButton 
-            color={show10D ? "green" : "red"} 
-            className="flex items-center gap-1"
-          >
+          <BloombergButton color={show10D ? "green" : "red"} className="flex items-center gap-1">
             <span>10D</span>
             <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
           </BloombergButton>
@@ -133,10 +127,7 @@ export function TerminalFilterBar({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <BloombergButton 
-            color={showYTD ? "green" : "red"} 
-            className="flex items-center gap-1"
-          >
+          <BloombergButton color={showYTD ? "green" : "red"} className="flex items-center gap-1">
             <span>%Chg {showYTD ? "YTD" : "Daily"}</span>
             <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
           </BloombergButton>
@@ -149,10 +140,7 @@ export function TerminalFilterBar({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <BloombergButton 
-            color={showCAD ? "green" : "red"} 
-            className="flex items-center gap-1"
-          >
+          <BloombergButton color={showCAD ? "green" : "red"} className="flex items-center gap-1">
             <span>{showCAD ? "CAD" : "USD"}</span>
             <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
           </BloombergButton>

@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { atom, useAtom } from "jotai";
 import { useQueryClient } from "@tanstack/react-query";
+import { atom, useAtom } from "jotai";
+import { useState } from "react";
 import type { MarketItem } from "../types";
 
 // Define Jotai atoms for AI state
 export const aiMarketCommentsAtom = atom<string>("");
-export const aiMarketQuestionsAtom = atom<Array<{ role: "user" | "assistant", content: string }>>([]);
+export const aiMarketQuestionsAtom = atom<Array<{ role: "user" | "assistant"; content: string }>>(
+  []
+);
 export const aiLoadingAtom = atom<boolean>(false);
 
 export function useAiMarketAnalysis() {
@@ -21,16 +23,16 @@ export function useAiMarketAnalysis() {
     benchmarkSecurity: MarketItem | undefined
   ) => {
     if (!selectedSecurity || !benchmarkSecurity) return;
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const marketData = {
         selectedSecurity,
         benchmarkSecurity,
       };
-      
+
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: {
@@ -38,16 +40,20 @@ export function useAiMarketAnalysis() {
         },
         body: JSON.stringify({
           messages: [
-            { role: "user", content: "Provide a brief market commentary on the selected security compared to the benchmark." }
+            {
+              role: "user",
+              content:
+                "Provide a brief market commentary on the selected security compared to the benchmark.",
+            },
           ],
           marketData,
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error("Failed to generate AI commentary");
       }
-      
+
       const data = await response.json();
       setAiComments(data.response);
     } catch (err) {
@@ -65,23 +71,20 @@ export function useAiMarketAnalysis() {
     benchmarkSecurity: MarketItem | undefined
   ) => {
     if (!selectedSecurity || !benchmarkSecurity || !question.trim()) return;
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     // Add user question to messages
-    const updatedMessages = [
-      ...aiMessages,
-      { role: "user" as const, content: question }
-    ];
+    const updatedMessages = [...aiMessages, { role: "user" as const, content: question }];
     setAiMessages(updatedMessages);
-    
+
     try {
       const marketData = {
         selectedSecurity,
         benchmarkSecurity,
       };
-      
+
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: {
@@ -92,18 +95,15 @@ export function useAiMarketAnalysis() {
           marketData,
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error("Failed to get AI response");
       }
-      
+
       const data = await response.json();
-      
+
       // Add AI response to messages
-      setAiMessages([
-        ...updatedMessages,
-        { role: "assistant" as const, content: data.response }
-      ]);
+      setAiMessages([...updatedMessages, { role: "assistant" as const, content: data.response }]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error occurred");
       console.error("Error asking AI question:", err);

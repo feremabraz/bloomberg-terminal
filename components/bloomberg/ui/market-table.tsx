@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/table";
 import { useAtom } from "jotai";
 import { MarketSection } from ".";
+import { filtersAtom, show10DAtom, showAvatAtom } from "../atoms";
 import { useMarketDataQuery } from "../hooks";
 import { bloombergColors, cn } from "../lib/theme-config";
-import { filtersAtom, showAvatAtom, show10DAtom } from "../atoms";
 import type { FilterState, MarketData } from "../types";
 
 const fixedColumnClass = "w-[120px] sm:w-[140px] whitespace-nowrap overflow-hidden text-ellipsis";
@@ -27,7 +27,7 @@ export function MarketTable({ data, isDarkMode }: MarketTableProps) {
   const [filters] = useAtom(filtersAtom);
   const [showAvat] = useAtom(showAvatAtom);
   const colors = isDarkMode ? bloombergColors.dark : bloombergColors.light;
-  
+
   // Add safety check for data
   if (!data) {
     return (
@@ -54,7 +54,9 @@ export function MarketTable({ data, isDarkMode }: MarketTableProps) {
           <TableHead className="px-2 py-1 text-right">Value</TableHead>
           <TableHead className="px-2 py-1 text-right">Net Chg</TableHead>
           <TableHead className="px-2 py-1 text-right">%Chg</TableHead>
-          <TableHead className={`px-2 py-1 text-right ${showAvat ? 'sm:table-cell' : 'hidden'}`}>Δ AVAT</TableHead>
+          <TableHead className={`px-2 py-1 text-right ${showAvat ? "sm:table-cell" : "hidden"}`}>
+            Δ AVAT
+          </TableHead>
           <TableHead className="px-2 py-1 text-right hidden sm:table-cell">Time</TableHead>
           <TableHead className="px-2 py-1 text-right hidden md:table-cell">%Ytd</TableHead>
           <TableHead className="px-2 py-1 text-right hidden md:table-cell">%YtdCur</TableHead>

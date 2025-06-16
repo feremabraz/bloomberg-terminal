@@ -1,7 +1,7 @@
-import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
-import { Message, CoreMessage } from "ai";
-import { NextRequest, NextResponse } from "next/server";
+import { streamText } from "ai";
+import { type CoreMessage, Message } from "ai";
+import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { rateLimit } from "./rate-limit";
 
@@ -12,12 +12,14 @@ export const runtime = "edge";
 
 // Define validation schema for request body
 const requestSchema = z.object({
-  messages: z.array(
-    z.object({
-      role: z.enum(["user", "assistant", "system"]),
-      content: z.string().max(4000),
-    })
-  ).max(20), // Limit number of messages
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant", "system"]),
+        content: z.string().max(4000),
+      })
+    )
+    .max(20), // Limit number of messages
   marketData: z.record(z.any()).optional(),
 });
 
@@ -50,15 +52,15 @@ export async function POST(req: NextRequest) {
 
     // Get request origin
     const origin = req.headers.get("origin") || "";
-    
+
     // Get allowed origins from environment variable
     // Format: comma-separated list of domains (e.g., "https://domain1.com,https://domain2.com")
     const allowedOriginsEnv = process.env.ALLOWED_ORIGINS || "";
     const allowedOrigins = allowedOriginsEnv
       .split(",")
-      .map(origin => origin.trim())
+      .map((origin) => origin.trim())
       .filter(Boolean);
-    
+
     // Always allow production URL if specified
     if (process.env.VERCEL_URL) {
       const vercelUrl = `https://${process.env.VERCEL_URL}`;
@@ -66,53 +68,54 @@ export async function POST(req: NextRequest) {
         allowedOrigins.push(vercelUrl);
       }
     }
-    
+
     // In development, also allow localhost origins if no origins are specified
     if (process.env.NODE_ENV === "development" && allowedOrigins.length === 0) {
       allowedOrigins.push("http://localhost:3000");
     }
-    
+
     // Skip origin check if no allowed origins are specified (not recommended for production)
     if (allowedOrigins.length > 0 && !allowedOrigins.includes(origin)) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized origin" }),
-        { status: 403, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized origin" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Parse and validate request body
     const body = await req.json();
     const validationResult = requestSchema.safeParse(body);
-    
+
     if (!validationResult.success) {
       return new Response(
-        JSON.stringify({ 
-          error: "Invalid request format", 
-          details: validationResult.error.errors 
+        JSON.stringify({
+          error: "Invalid request format",
+          details: validationResult.error.errors,
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
     const { messages, marketData } = validationResult.data;
-    
+
     // Sanitize market data to prevent injection
-    const sanitizedMarketData = marketData ? 
-      JSON.stringify(marketData).slice(0, 5000) : // Limit size
-      "{}";
-    
+    const sanitizedMarketData = marketData
+      ? JSON.stringify(marketData).slice(0, 5000)
+      : // Limit size
+        "{}";
+
     const systemPrompt = `You are an AI financial analyst for a Bloomberg Terminal clone.
 You provide concise, insightful commentary and answer questions about market data.
 Current market data context: ${sanitizedMarketData}
 Keep responses brief, professional, and focused on financial insights.
 Never provide investment advice or make specific trading recommendations.`;
-    
+
     // Prepend the system message to the messages array and ensure correct typing
     const messagesWithSystem: CoreMessage[] = [
       { role: "system", content: systemPrompt } as CoreMessage,
-      ...messages.map(m => ({ role: m.role, content: m.content }) as CoreMessage)
+      ...messages.map((m) => ({ role: m.role, content: m.content }) as CoreMessage),
     ];
-    
+
     // Use the AI SDK to stream text with strict limits
     const result = streamText({
       model: openai("gpt-4"),
@@ -120,19 +123,19 @@ Never provide investment advice or make specific trading recommendations.`;
       temperature: 0.7,
       maxTokens: 500, // Strict token limit
     });
-    
+
     // Return the stream with rate limit headers
     const response = result.toDataStreamResponse();
     response.headers.set("X-RateLimit-Limit", rateLimitResult.limit.toString());
     response.headers.set("X-RateLimit-Remaining", rateLimitResult.remaining.toString());
     response.headers.set("X-RateLimit-Reset", rateLimitResult.reset.toString());
-    
+
     return response;
   } catch (error) {
     console.error("AI API error:", error);
-    return new Response(
-      JSON.stringify({ error: "Failed to generate AI response" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Failed to generate AI response" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

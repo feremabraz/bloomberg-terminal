@@ -1,33 +1,33 @@
 "use client";
 
-import { useCallback } from "react";
 import { useAtom } from "jotai";
-import { ConfirmationModal } from "../core/confirmation-modal";
-import { useTerminalUI } from "../hooks";
-import { useMarketDataQuery } from "../hooks";
-import { 
-  isConfirmModalOpenAtom,
-  confirmModalPropsAtom,
-  isWatchlistOpenAtom,
-  watchlistsAtom,
+import { useCallback } from "react";
+import {
   activeWatchlistAtom,
-  openConfirmModalAtom,
+  addWatchlistAtom,
   closeConfirmModalAtom,
   confirmAndCloseModalAtom,
-  addWatchlistAtom
+  confirmModalPropsAtom,
+  isConfirmModalOpenAtom,
+  isWatchlistOpenAtom,
+  openConfirmModalAtom,
+  watchlistsAtom,
 } from "../atoms/terminal-ui";
-import { writableFiltersAtom, defaultFilters, resetFiltersAtom } from "../atoms/terminal-ui";
+import { defaultFilters, resetFiltersAtom, writableFiltersAtom } from "../atoms/terminal-ui";
+import { ConfirmationModal } from "../core/confirmation-modal";
 import { ShortcutsHelp } from "../core/keyboard-shortcuts";
+import { Watchlist } from "../core/watchlist";
+import { useTerminalUI } from "../hooks";
+import { useMarketDataQuery } from "../hooks";
 import { TerminalFilterBar } from "../layout/terminal-filter-bar";
 import { TerminalHeader } from "../layout/terminal-header";
 import { TerminalLayout } from "../layout/terminal-layout";
-import MarketMoversView from "../views/market-movers-view";
-import NewsView from "../views/news-view";
 import type { FilterState, MarketItem } from "../types";
+import MarketMoversView from "../views/market-movers-view";
 import { MarketView } from "../views/market-view";
-import VolatilityView from "../views/volatility-view";
+import NewsView from "../views/news-view";
 import { RmiView } from "../views/rmi-view";
-import { Watchlist } from "../core/watchlist";
+import VolatilityView from "../views/volatility-view";
 
 export default function BloombergTerminal() {
   // Use our custom hooks for state management
@@ -59,7 +59,7 @@ export default function BloombergTerminal() {
   const [activeWatchlist, setActiveWatchlist] = useAtom(activeWatchlistAtom);
   const [filters, setFilters] = useAtom(writableFiltersAtom);
   const [, resetFilters] = useAtom(resetFiltersAtom);
-  
+
   // Action atoms
   const [, openConfirmModal] = useAtom(openConfirmModalAtom);
   const [, closeConfirmModal] = useAtom(closeConfirmModalAtom);
@@ -245,10 +245,7 @@ export default function BloombergTerminal() {
         onThemeToggle={handleThemeToggle}
       />
 
-      <TerminalFilterBar
-        isDarkMode={isDarkMode}
-        watchlists={watchlists}
-      />
+      <TerminalFilterBar isDarkMode={isDarkMode} watchlists={watchlists} />
 
       <MarketView isDarkMode={isDarkMode} />
 

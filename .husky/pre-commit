@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Get staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [ -z "$STAGED_FILES" ]; then
+  echo "No staged files to check"
+  exit 0
+fi
+
+echo "🔍 Running pre-commit checks on staged files..."
+
+# Check if there are TypeScript/JavaScript files staged
+TS_JS_FILES=$(echo "$STAGED_FILES" | grep -E '\.(ts|js|tsx|jsx|mjs|cjs)$' || true)
+
+if [ -n "$TS_JS_FILES" ]; then
+  echo "📝 Running Biome checks..."
+  
+  # Runs Biome check (format + lint) directly on staged files from the monorepo root
+  echo "$TS_JS_FILES" | xargs -r pnpm exec biome check --write
+  BIOME_EXIT_CODE=$?
+
+  if [ $BIOME_EXIT_CODE -ne 0 ]; then
+    echo "❌ Biome checks failed. Please fix the issues before committing."
+    exit $BIOME_EXIT_CODE
+  fi
+  
+  # Run type checking
+  echo "🔍 Running type checking..."
+  pnpm typecheck
+  TYPECHECK_EXIT_CODE=$?
+
+  if [ $TYPECHECK_EXIT_CODE -ne 0 ]; then
+    echo "❌ TypeScript type checking failed. Please fix the issues before committing."
+    exit $TYPECHECK_EXIT_CODE
+  fi
+  
+  # Re-add formatted files to staging (Biome might have changed them)
+  # Only add if TS_JS_FILES is not empty
+  if [ -n "$TS_JS_FILES" ]; then
+    echo "$TS_JS_FILES" | xargs -r git add
+  fi
+fi
+
+echo "✅ Pre-commit checks completed!"

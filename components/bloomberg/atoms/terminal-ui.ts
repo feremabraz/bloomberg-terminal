@@ -2,14 +2,14 @@ import { atom } from "jotai";
 import { atomWithReset } from "jotai/utils";
 import type { FilterState } from "../types";
 import {
-  showMoversAtom,
-  showVolatilityAtom,
-  showRatiosAtom,
-  showFuturesAtom,
-  showAvatAtom,
   show10DAtom,
-  showYTDAtom,
+  showAvatAtom,
   showCADAtom,
+  showFuturesAtom,
+  showMoversAtom,
+  showRatiosAtom,
+  showVolatilityAtom,
+  showYTDAtom,
 } from "./index";
 
 // Modal state atoms
@@ -23,16 +23,17 @@ export const confirmModalPropsAtom = atom({
 // Writable filters atom
 export const writableFiltersAtom = atom(
   // Get function - read from individual atoms
-  (get) => ({
-    showMovers: get(showMoversAtom),
-    showVolatility: get(showVolatilityAtom),
-    showRatios: get(showRatiosAtom),
-    showFutures: get(showFuturesAtom),
-    showAvat: get(showAvatAtom),
-    show10D: get(show10DAtom),
-    showYTD: get(showYTDAtom),
-    showCAD: get(showCADAtom),
-  } as FilterState),
+  (get) =>
+    ({
+      showMovers: get(showMoversAtom),
+      showVolatility: get(showVolatilityAtom),
+      showRatios: get(showRatiosAtom),
+      showFutures: get(showFuturesAtom),
+      showAvat: get(showAvatAtom),
+      show10D: get(show10DAtom),
+      showYTD: get(showYTDAtom),
+      showCAD: get(showCADAtom),
+    }) as FilterState,
   // Set function - update individual atoms
   (get, set, newFilters: FilterState) => {
     set(showMoversAtom, newFilters.showMovers);
@@ -59,12 +60,9 @@ export const defaultFilters: FilterState = {
 };
 
 // Reset filters atom
-export const resetFiltersAtom = atom(
-  null,
-  (get, set) => {
-    set(writableFiltersAtom, defaultFilters);
-  }
-);
+export const resetFiltersAtom = atom(null, (get, set) => {
+  set(writableFiltersAtom, defaultFilters);
+});
 
 // Watchlist state atoms
 export const isWatchlistOpenAtom = atom(false);

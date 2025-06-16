@@ -49,7 +49,6 @@ export function KeyboardShortcuts({ shortcuts, isEnabled = true }: KeyboardShort
   return null;
 }
 
-
 interface Shortcut {
   key: string;
   description: string;
@@ -80,7 +79,7 @@ export function ShortcutsHelp({ shortcuts, isOpen, onClose, isDarkMode }: Shortc
     >
       {/* Semi-transparent backdrop */}
       <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
-      
+
       {/* Modal container - for centering */}
       <div className="relative w-full h-full flex items-center justify-center">
         <div
@@ -88,48 +87,48 @@ export function ShortcutsHelp({ shortcuts, isOpen, onClose, isDarkMode }: Shortc
           style={{
             backgroundColor: colors.surface,
             borderColor: colors.border,
-            color: colors.text
+            color: colors.text,
           }}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}
           tabIndex={-1}
         >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold">Keyboard Shortcuts</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-bold">Keyboard Shortcuts</h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
 
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b border-[${colors.border}]">
-              <th className="text-left py-1">Shortcut</th>
-              <th className="text-left py-1">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {shortcuts.map((shortcut) => (
-              <tr
-                key={`${shortcut.key}-${shortcut.ctrlKey ? "ctrl" : ""}-${shortcut.altKey ? "alt" : ""}-${shortcut.shiftKey ? "shift" : ""}`}
-                className="border-b border-[${colors.border}]"
-              >
-                <td className="py-1">
-                  {shortcut.ctrlKey && <span>Ctrl + </span>}
-                  {shortcut.altKey && <span>Alt + </span>}
-                  {shortcut.shiftKey && <span>Shift + </span>}
-                  <span className="font-bold">{shortcut.key.toUpperCase()}</span>
-                </td>
-                <td className="py-1">{shortcut.description}</td>
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-[${colors.border}]">
+                <th className="text-left py-1">Shortcut</th>
+                <th className="text-left py-1">Description</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {shortcuts.map((shortcut) => (
+                <tr
+                  key={`${shortcut.key}-${shortcut.ctrlKey ? "ctrl" : ""}-${shortcut.altKey ? "alt" : ""}-${shortcut.shiftKey ? "shift" : ""}`}
+                  className="border-b border-[${colors.border}]"
+                >
+                  <td className="py-1">
+                    {shortcut.ctrlKey && <span>Ctrl + </span>}
+                    {shortcut.altKey && <span>Alt + </span>}
+                    {shortcut.shiftKey && <span>Shift + </span>}
+                    <span className="font-bold">{shortcut.key.toUpperCase()}</span>
+                  </td>
+                  <td className="py-1">{shortcut.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </dialog>

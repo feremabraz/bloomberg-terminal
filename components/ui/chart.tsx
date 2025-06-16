@@ -72,12 +72,12 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
   // Generate CSS variables for each theme
   const cssVariablesRef = React.useRef<Record<string, Record<string, string>>>({});
-  
+
   // Update the ref value
   cssVariablesRef.current = {};
   Object.entries(THEMES).forEach(([theme, prefix]) => {
     cssVariablesRef.current[theme] = {};
-    
+
     colorConfig.forEach(([key, itemConfig]) => {
       const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
       if (color) {
@@ -90,34 +90,33 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   React.useEffect(() => {
     const applyStyles = () => {
       const chartElements = document.querySelectorAll(`[data-chart="${id}"]`);
-      const isDark = document.documentElement.classList.contains('dark');
-      const theme = isDark ? 'dark' : 'light';
-      
-      chartElements.forEach(element => {
+      const isDark = document.documentElement.classList.contains("dark");
+      const theme = isDark ? "dark" : "light";
+
+      chartElements.forEach((element) => {
         Object.entries(cssVariablesRef.current[theme] || {}).forEach(([variable, value]) => {
           (element as HTMLElement).style.setProperty(variable, value as string);
         });
       });
     };
-    
+
     // Apply styles immediately
     applyStyles();
-    
+
     // Set up a mutation observer to watch for theme changes
-    const observer = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        if (mutation.attributeName === 'class' && 
-            mutation.target === document.documentElement) {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class" && mutation.target === document.documentElement) {
           applyStyles();
         }
       });
     });
-    
+
     observer.observe(document.documentElement, { attributes: true });
-    
+
     return () => observer.disconnect();
   }, [id]); // cssVariablesRef is a ref, so we don't need it in the dependency array
-  
+
   // Return null instead of a style tag
   return null;
 };

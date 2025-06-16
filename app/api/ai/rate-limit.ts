@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
+import { type NextRequest, NextResponse } from "next/server";
 
 // Initialize Redis client
 const redis = new Redis({
@@ -20,34 +20,34 @@ export async function rateLimit(
   // Get IP address from request headers
   const forwarded = req.headers.get("x-forwarded-for");
   const ip = forwarded ? forwarded.split(",")[0] : req.headers.get("x-real-ip") || "anonymous";
-  
+
   // Create a unique key for this IP and endpoint
   const key = `rate-limit:ai:${ip}`;
-  
+
   // Get current count and timestamp
   const now = Math.floor(Date.now() / 1000);
   const windowExpiry = now + config.windowInSeconds;
-  
+
   // Use Redis to track request count
   const count = await redis.incr(key);
-  
+
   // Get TTL for the key
   const ttl = await redis.ttl(key);
   const expiry = ttl > 0 ? Math.floor(Date.now() / 1000) + ttl : windowExpiry;
-  
+
   // Set expiry if this is the first request in the window
   if (count === 1) {
     await redis.expire(key, config.windowInSeconds);
   }
-  
+
   // Calculate time until reset
   const reset = expiry || windowExpiry;
   const remaining = Math.max(0, config.maxRequests - count);
-  
+
   return {
     success: count <= config.maxRequests,
     limit: config.maxRequests,
     remaining,
-    reset
+    reset,
   };
 }

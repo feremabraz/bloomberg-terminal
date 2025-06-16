@@ -2,8 +2,8 @@
 
 import { X } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { BloombergButton } from "./bloomberg-button";
 import { bloombergColors } from "../lib/theme-config";
+import { BloombergButton } from "./bloomberg-button";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -66,44 +66,44 @@ export function ConfirmationModal({
     >
       {/* Semi-transparent backdrop */}
       <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
-      
+
       {/* Modal container - for centering */}
       <div className="relative w-full h-full flex items-center justify-center">
-      <div
-        ref={modalRef}
-        className="w-80 border-2 p-4 shadow-lg rounded-sm"
-        style={{
-          backgroundColor: colors.surface,
-          borderColor: colors.border,
-          color: colors.text
-        }}
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-        tabIndex={-1}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h2 id="modal-title" className="text-sm font-bold">
-            {title}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
+        <div
+          ref={modalRef}
+          className="w-80 border-2 p-4 shadow-lg rounded-sm"
+          style={{
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            color: colors.text,
+          }}
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+          tabIndex={-1}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 id="modal-title" className="text-sm font-bold">
+              {title}
+            </h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="mb-6 text-xs">{message}</p>
+          <div className="flex justify-end space-x-2">
+            <BloombergButton color="red" onClick={onClose}>
+              {cancelText}
+            </BloombergButton>
+            <BloombergButton color="green" onClick={onConfirm}>
+              {confirmText}
+            </BloombergButton>
+          </div>
         </div>
-        <p className="mb-6 text-xs">{message}</p>
-        <div className="flex justify-end space-x-2">
-          <BloombergButton color="red" onClick={onClose}>
-            {cancelText}
-          </BloombergButton>
-          <BloombergButton color="green" onClick={onConfirm}>
-            {confirmText}
-          </BloombergButton>
-        </div>
-      </div>
       </div>
     </dialog>
   );

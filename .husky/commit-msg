@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Read the commit message
+commit_message=$(cat "$1")
+
+# Check if commit message is empty
+if [ -z "$(echo "$commit_message" | tr -d '\n\r ')" ]; then
+  echo "❌ Commit message cannot be empty"
+  exit 1
+fi
+
+# Check minimum length
+if [ $(echo "$commit_message" | wc -c) -lt 10 ]; then
+  echo "❌ Commit message should be at least 10 characters long"
+  exit 1
+fi
+
+# Check for conventional commit format (optional but recommended)
+if echo "$commit_message" | grep -qE "^(feat|fix|docs|style|refactor|test|chore|ci|build|perf)(\(.+\))?: .+"; then
+  echo "✅ Conventional commit format detected"
+elif echo "$commit_message" | grep -qE "^(Merge|Revert|Initial commit)"; then
+  echo "✅ Valid commit type detected"
+else
+  echo "💡 Consider using conventional commit format:"
+  echo "   feat: add new feature"
+  echo "   fix: bug fix"
+  echo "   docs: documentation changes"
+  echo "   style: formatting changes"
+  echo "   refactor: code refactoring"
+  echo "   test: add tests"
+  echo "   chore: maintenance tasks"
+  echo ""
+  echo "✅ Commit message accepted (not enforcing conventional commits)"
+fi
+
+exit 0

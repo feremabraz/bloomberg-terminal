@@ -32,28 +32,31 @@ export default function NewsView({ isDarkMode, onBack }: NewsViewProps) {
 
   const colors = isDarkMode ? bloombergColors.dark : bloombergColors.light;
 
-  const fetchNews = useCallback(async (query = searchTerm) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const fetchNews = useCallback(
+    async (query = searchTerm) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      const newsData = await fetchFinancialNews(query);
+        const newsData = await fetchFinancialNews(query);
 
-      if (newsData) {
-        setNews(newsData);
-      } else {
-        // If no data, use fallback
+        if (newsData) {
+          setNews(newsData);
+        } else {
+          // If no data, use fallback
+          setNews(generateFallbackNews());
+          setError("Could not fetch real news data. Showing sample news.");
+        }
+      } catch (err) {
+        console.error("Error fetching news:", err);
+        setError("Failed to fetch news");
         setNews(generateFallbackNews());
-        setError("Could not fetch real news data. Showing sample news.");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      console.error("Error fetching news:", err);
-      setError("Failed to fetch news");
-      setNews(generateFallbackNews());
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchTerm]);
+    },
+    [searchTerm]
+  );
 
   // Generate fallback news data
   const generateFallbackNews = (): NewsItem[] => {

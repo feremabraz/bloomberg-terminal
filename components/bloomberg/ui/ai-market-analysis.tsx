@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useChat } from "@ai-sdk/react";
-import { BloombergButton } from "../core/bloomberg-button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { Send, RefreshCw, X } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useChat } from "@ai-sdk/react";
+import { RefreshCw, Send, X } from "lucide-react";
+import { useState } from "react";
+import { BloombergButton } from "../core/bloomberg-button";
 import type { MarketItem } from "../types";
 
 interface AiMarketAnalysisProps {
@@ -22,62 +22,68 @@ interface AiMarketAnalysisProps {
   };
 }
 
-export function AiMarketAnalysis({ 
-  selectedSecurity, 
-  benchmarkSecurity, 
-  colors 
+export function AiMarketAnalysis({
+  selectedSecurity,
+  benchmarkSecurity,
+  colors,
 }: AiMarketAnalysisProps) {
   const [commentaryMode, setCommentaryMode] = useState<boolean>(true);
-  
+
   // Use the AI SDK's useChat hook for streaming responses
-  const { 
-    messages, 
-    input, 
-    handleInputChange, 
-    handleSubmit, 
-    isLoading, 
-    error, 
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    error,
     reload,
     stop,
-    setMessages
+    setMessages,
   } = useChat({
     api: "/api/ai",
     // Include market data in the request
     body: {
       marketData: {
         selectedSecurity,
-        benchmarkSecurity
-      }
+        benchmarkSecurity,
+      },
     },
     id: "market-analysis",
   });
-  
+
   // Generate market commentary
   const generateCommentary = () => {
     setCommentaryMode(true);
-    setMessages([{
-      id: "system-1",
-      role: "system",
-      content: "You are an AI financial analyst. Provide a brief market commentary."
-    }, {
-      id: "user-1",
-      role: "user",
-      content: `Provide a brief market commentary on ${selectedSecurity?.id} compared to ${benchmarkSecurity?.id}.`
-    }]);
+    setMessages([
+      {
+        id: "system-1",
+        role: "system",
+        content: "You are an AI financial analyst. Provide a brief market commentary.",
+      },
+      {
+        id: "user-1",
+        role: "user",
+        content: `Provide a brief market commentary on ${selectedSecurity?.id} compared to ${benchmarkSecurity?.id}.`,
+      },
+    ]);
   };
-  
+
   // Clear conversation
   const clearChat = () => {
     setMessages([]);
   };
-  
+
   return (
-    <div className="p-4 border rounded-sm" style={{ borderColor: colors.border, backgroundColor: colors.surface }}>
+    <div
+      className="p-4 border rounded-sm"
+      style={{ borderColor: colors.border, backgroundColor: colors.surface }}
+    >
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-bold">AI Market Analysis</h3>
         <div className="flex gap-2">
-          <BloombergButton 
-            color="accent" 
+          <BloombergButton
+            color="accent"
             onClick={generateCommentary}
             disabled={isLoading}
             className="flex items-center gap-1 text-xs"
@@ -85,10 +91,10 @@ export function AiMarketAnalysis({
             <RefreshCw className="h-3 w-3" />
             REFRESH
           </BloombergButton>
-          
+
           {messages.length > 0 && (
-            <BloombergButton 
-              color="red" 
+            <BloombergButton
+              color="red"
               onClick={clearChat}
               disabled={isLoading}
               className="flex items-center gap-1 text-xs"
@@ -99,14 +105,14 @@ export function AiMarketAnalysis({
           )}
         </div>
       </div>
-      
+
       {/* AI Commentary Section */}
-      <div 
-        className="p-3 mb-4 border rounded-sm text-xs" 
-        style={{ 
-          borderColor: colors.border, 
+      <div
+        className="p-3 mb-4 border rounded-sm text-xs"
+        style={{
+          borderColor: colors.border,
           backgroundColor: colors.background,
-          minHeight: "80px"
+          minHeight: "80px",
         }}
       >
         {isLoading && messages.length === 0 ? (
@@ -116,16 +122,15 @@ export function AiMarketAnalysis({
             Error: {error.message}. Please try again.
           </p>
         ) : messages.length > 0 && messages[messages.length - 1].role === "assistant" ? (
-          <p className="text-xs whitespace-pre-line">
-            {messages[messages.length - 1].content}
-          </p>
+          <p className="text-xs whitespace-pre-line">{messages[messages.length - 1].content}</p>
         ) : (
           <p className="text-xs text-gray-500">
-            Click REFRESH to generate AI commentary on {selectedSecurity?.id} compared to {benchmarkSecurity?.id}.
+            Click REFRESH to generate AI commentary on {selectedSecurity?.id} compared to{" "}
+            {benchmarkSecurity?.id}.
           </p>
         )}
       </div>
-      
+
       {/* Question and Answer Section */}
       <div className="mb-4">
         <h4 className="text-xs font-bold mb-2">Ask a Question</h4>
@@ -135,16 +140,16 @@ export function AiMarketAnalysis({
             onChange={handleInputChange}
             placeholder="Ask about market trends, correlations, etc."
             className="flex-1 h-8 text-xs font-mono rounded-none border focus:ring-0 focus:ring-offset-0"
-            style={{ 
-              backgroundColor: colors.background, 
+            style={{
+              backgroundColor: colors.background,
               borderColor: colors.border,
-              color: colors.text
+              color: colors.text,
             }}
             disabled={isLoading}
           />
-          <BloombergButton 
-            type="submit" 
-            color="accent" 
+          <BloombergButton
+            type="submit"
+            color="accent"
             disabled={isLoading || !input.trim()}
             className="flex items-center gap-1 text-xs"
           >
@@ -153,31 +158,32 @@ export function AiMarketAnalysis({
           </BloombergButton>
         </form>
       </div>
-      
+
       {/* Conversation History */}
       {messages.length > 1 && (
-        <div 
+        <div
           className="p-3 border rounded-sm text-xs max-h-[200px] overflow-y-auto"
-          style={{ 
-            borderColor: colors.border, 
-            backgroundColor: colors.background
+          style={{
+            borderColor: colors.border,
+            backgroundColor: colors.background,
           }}
         >
-          {messages.map((message) => (
-            message.role !== "system" && (
-              <div key={message.id} className="mb-2 last:mb-0">
-                <p 
-                  className="font-bold text-xs mb-1"
-                  style={{ 
-                    color: message.role === "user" ? colors.accent : colors.text 
-                  }}
-                >
-                  {message.role === "user" ? "You" : "AI Assistant"}:
-                </p>
-                <p className="text-xs whitespace-pre-line pl-2">{message.content}</p>
-              </div>
-            )
-          ))}
+          {messages.map(
+            (message) =>
+              message.role !== "system" && (
+                <div key={message.id} className="mb-2 last:mb-0">
+                  <p
+                    className="font-bold text-xs mb-1"
+                    style={{
+                      color: message.role === "user" ? colors.accent : colors.text,
+                    }}
+                  >
+                    {message.role === "user" ? "You" : "AI Assistant"}:
+                  </p>
+                  <p className="text-xs whitespace-pre-line pl-2">{message.content}</p>
+                </div>
+              )
+          )}
           {isLoading && (
             <div className="mt-2">
               <Skeleton className="h-4 w-full mb-1" />

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useAtom } from "jotai";
+import { useState } from "react";
 import {
   Area,
   AreaChart,
@@ -12,8 +12,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { bloombergColors } from "../lib/theme-config";
 import { isDarkModeAtom, rmiTimeRangeAtom } from "../atoms";
+import { bloombergColors } from "../lib/theme-config";
 import type { MarketItem } from "../types";
 
 interface RmiChartProps {
@@ -30,12 +30,7 @@ interface RmiDataPoint {
   benchmark?: number;
 }
 
-export function RmiChart({
-  marketItem,
-  benchmarkItem,
-  width = 600,
-  height = 300,
-}: RmiChartProps) {
+export function RmiChart({ marketItem, benchmarkItem, width = 600, height = 300 }: RmiChartProps) {
   const [isDarkMode] = useAtom(isDarkModeAtom);
   const [timeRange] = useAtom(rmiTimeRangeAtom);
   const colors = isDarkMode ? bloombergColors.dark : bloombergColors.light;
@@ -53,16 +48,9 @@ export function RmiChart({
       marketItem.value * 0.99,
       marketItem.value,
     ];
-    
-    const benchmarkValues = benchmarkItem?.sparkline1 || [
-      100,
-      101,
-      99,
-      102,
-      103,
-      104,
-    ];
-    
+
+    const benchmarkValues = benchmarkItem?.sparkline1 || [100, 101, 99, 102, 103, 104];
+
     // Generate dates for the last N days based on timeRange
     const days = marketValues.length;
     const dates = Array.from({ length: days }, (_, i) => {
@@ -70,17 +58,17 @@ export function RmiChart({
       date.setDate(date.getDate() - (days - i - 1));
       return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     });
-    
+
     // Calculate RMI values (normalized to 100 at the start)
     const baseMarket = marketValues[0];
     const baseBenchmark = benchmarkValues[0];
-    
+
     return marketValues.map((value, i) => {
       // RMI calculation: (security / base_security) / (benchmark / base_benchmark) * 100
       const normalizedSecurity = value / baseMarket;
       const normalizedBenchmark = benchmarkValues[i] / baseBenchmark;
       const rmi = (normalizedSecurity / normalizedBenchmark) * 100;
-      
+
       return {
         time: dates[i],
         value: value,
@@ -91,7 +79,7 @@ export function RmiChart({
   };
 
   const data = generateRmiData();
-  
+
   // Determine if RMI is trending up or down
   const rmiTrend = data[data.length - 1].rmi > data[0].rmi;
   const rmiColor = rmiTrend ? colors.positive : colors.negative;
@@ -101,7 +89,14 @@ export function RmiChart({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="p-2 rounded-sm shadow-md" style={{ backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }}>
+        <div
+          className="p-2 rounded-sm shadow-md"
+          style={{
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            color: colors.text,
+          }}
+        >
           <p className="text-xs font-bold">{data.time}</p>
           <p className="text-xs" style={{ color: rmiColor }}>
             RMI: {data.rmi.toFixed(2)}
@@ -121,7 +116,10 @@ export function RmiChart({
   };
 
   return (
-    <div className="p-4 border rounded-sm" style={{ borderColor: colors.border, backgroundColor: colors.surface }}>
+    <div
+      className="p-4 border rounded-sm"
+      style={{ borderColor: colors.border, backgroundColor: colors.surface }}
+    >
       <div className="flex justify-between items-center mb-4">
         <div>
           <h3 className="text-sm font-bold">{marketItem.id} Relative Market Index</h3>
@@ -134,9 +132,7 @@ export function RmiChart({
             <button
               type="button"
               key={range}
-              className={`text-xs px-2 py-1 rounded-sm ${
-                timeRange === range ? "font-bold" : ""
-              }`}
+              className={`text-xs px-2 py-1 rounded-sm ${timeRange === range ? "font-bold" : ""}`}
               style={{
                 backgroundColor: timeRange === range ? colors.accent : "transparent",
                 color: timeRange === range ? "#fff" : colors.text,
@@ -147,16 +143,16 @@ export function RmiChart({
           ))}
         </div>
       </div>
-      
+
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold" style={{ color: rmiColor }}>
             {data[data.length - 1].rmi.toFixed(2)}
           </span>
           <span className="text-xs" style={{ color: rmiColor }}>
-            {rmiTrend ? "▲" : "▼"} 
-            {Math.abs(data[data.length - 1].rmi - data[0].rmi).toFixed(2)} 
-            ({((data[data.length - 1].rmi / data[0].rmi - 1) * 100).toFixed(2)}%)
+            {rmiTrend ? "▲" : "▼"}
+            {Math.abs(data[data.length - 1].rmi - data[0].rmi).toFixed(2)}(
+            {((data[data.length - 1].rmi / data[0].rmi - 1) * 100).toFixed(2)}%)
           </span>
         </div>
         <div className="text-xs" style={{ color: colors.textSecondary }}>
@@ -182,17 +178,17 @@ export function RmiChart({
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
-          <XAxis 
-            dataKey="time" 
-            tick={{ fontSize: 10, fill: colors.text }} 
-            tickLine={{ stroke: colors.border }}
-            axisLine={{ stroke: colors.border }}
-          />
-          <YAxis 
+          <XAxis
+            dataKey="time"
             tick={{ fontSize: 10, fill: colors.text }}
             tickLine={{ stroke: colors.border }}
             axisLine={{ stroke: colors.border }}
-            domain={['dataMin - 5', 'dataMax + 5']}
+          />
+          <YAxis
+            tick={{ fontSize: 10, fill: colors.text }}
+            tickLine={{ stroke: colors.border }}
+            axisLine={{ stroke: colors.border }}
+            domain={["dataMin - 5", "dataMax + 5"]}
           />
           <Tooltip content={<CustomTooltip />} />
           <Area
@@ -205,7 +201,7 @@ export function RmiChart({
           />
         </AreaChart>
       </ResponsiveContainer>
-      
+
       <div className="mt-2 text-xs" style={{ color: colors.textSecondary }}>
         Last updated: {marketItem.lastUpdated || new Date().toLocaleTimeString()}
       </div>

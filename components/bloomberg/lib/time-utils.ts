@@ -29,7 +29,7 @@ export function getYearStartDate(): Date {
  * @returns Formatted date string
  */
 export function formatDate(date: Date): string {
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split("T")[0];
 }
 
 /**
@@ -50,16 +50,20 @@ export function calculateYTDChange(currentValue: number, startOfYearValue: numbe
  * @param volatility Volatility factor (0-1)
  * @returns Array of daily values
  */
-export function generateHistoricalData(days: number, baseValue: number, volatility = 0.02): number[] {
+export function generateHistoricalData(
+  days: number,
+  baseValue: number,
+  volatility = 0.02
+): number[] {
   const data: number[] = [];
   let currentValue = baseValue;
-  
+
   for (let i = 0; i < days; i++) {
     // Random walk with drift
     const change = currentValue * (Math.random() * volatility * 2 - volatility);
     currentValue += change;
     data.push(Math.max(0.01, currentValue)); // Ensure no negative values
   }
-  
+
   return data;
 }

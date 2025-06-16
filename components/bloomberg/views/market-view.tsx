@@ -27,7 +27,7 @@ export function MarketView({ isDarkMode }: MarketViewProps) {
     return (
       <div className="p-8 text-center">
         <p className="text-red-500 font-mono">Error loading market data</p>
-        <p className="text-sm mt-2">{error instanceof Error ? error.message : 'Unknown error'}</p>
+        <p className="text-sm mt-2">{error instanceof Error ? error.message : "Unknown error"}</p>
       </div>
     );
   }
@@ -37,13 +37,10 @@ export function MarketView({ isDarkMode }: MarketViewProps) {
       <div className="overflow-x-auto">
         <MarketTable data={data} isDarkMode={isDarkMode} />
       </div>
-      
+
       {/* AI Market Analysis for general market data */}
       <div className="px-4 pb-6">
-        <GeneralMarketAnalysis 
-          marketData={data} 
-          colors={colors} 
-        />
+        <GeneralMarketAnalysis marketData={data} colors={colors} />
       </div>
     </div>
   );

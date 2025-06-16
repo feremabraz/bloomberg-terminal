@@ -2,11 +2,11 @@
 
 import { TableCell } from "@/components/ui/table";
 import { useAtom } from "jotai";
+import { show10DAtom } from "../atoms";
 import { bloombergColors, cn } from "../lib/theme-config";
 import { generateHistoricalData } from "../lib/time-utils";
-import { Sparkline } from "./sparkline";
-import { show10DAtom } from "../atoms";
 import type { MarketItem } from "../types";
+import { Sparkline } from "./sparkline";
 
 type SparklineCellProps = {
   item: MarketItem;
@@ -22,15 +22,15 @@ export function SparklineCell({ item, region, isDarkMode, isHighlighted }: Spark
 
   // Generate 10-day historical data if needed and not already available
   const tenDayData = item.historicalData10D || generateHistoricalData(10, item.value, 0.02);
-  
+
   // Determine which data to display based on 10D filter state
-  const displayData1 = show10D 
-    ? tenDayData 
-    : (item.sparkline1 || [0.5, 0.6, 0.4, 0.7, 0.5, 0.8, 0.6, 0.7]);
-    
-  const displayData2 = show10D 
+  const displayData1 = show10D
+    ? tenDayData
+    : item.sparkline1 || [0.5, 0.6, 0.4, 0.7, 0.5, 0.8, 0.6, 0.7];
+
+  const displayData2 = show10D
     ? tenDayData.map((val, i) => val * (1 + (i % 3 === 0 ? 0.05 : -0.03))) // Create slight variation for second line
-    : (item.sparkline2 || [0.7, 0.5, 0.8, 0.6, 0.9, 0.7, 1.0, 0.8]);
+    : item.sparkline2 || [0.7, 0.5, 0.8, 0.6, 0.9, 0.7, 1.0, 0.8];
 
   return (
     <TableCell
@@ -49,9 +49,7 @@ export function SparklineCell({ item, region, isDarkMode, isHighlighted }: Spark
           color2={item.change > 0 ? colors.positive : colors.negative}
           isRealData={!!item.sparklineUpdated || show10D}
         />
-        {show10D && (
-          <div className="absolute top-0 right-0 text-[8px] text-gray-500">10D</div>
-        )}
+        {show10D && <div className="absolute top-0 right-0 text-[8px] text-gray-500">10D</div>}
       </div>
     </TableCell>
   );

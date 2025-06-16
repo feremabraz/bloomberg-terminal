@@ -6,8 +6,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Edit, Save, X } from "lucide-react";
 import { useState } from "react";
-import { BloombergButton } from "./bloomberg-button";
 import { bloombergColors } from "../lib/theme-config";
+import { BloombergButton } from "./bloomberg-button";
 
 interface WatchlistItem {
   id: string;
@@ -80,7 +80,7 @@ export function Watchlist({ isOpen, onClose, isDarkMode, marketIndices, onSave }
     >
       {/* Semi-transparent backdrop */}
       <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
-      
+
       {/* Modal container - for centering */}
       <div className="relative w-full h-full flex items-center justify-center">
         <div
@@ -88,14 +88,17 @@ export function Watchlist({ isOpen, onClose, isDarkMode, marketIndices, onSave }
           style={{
             backgroundColor: colors.surface,
             borderColor: colors.border,
-            color: colors.text
+            color: colors.text,
           }}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}
           tabIndex={-1}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-2 border-b" style={{ borderColor: colors.border }}>
+          <div
+            className="flex items-center justify-between p-2 border-b"
+            style={{ borderColor: colors.border }}
+          >
             <div className="flex items-center gap-2">
               {isEditing ? (
                 <Input

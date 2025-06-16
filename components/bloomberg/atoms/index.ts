@@ -37,16 +37,17 @@ export const showCADAtom = atom(false);
 
 // Composite filter state atom for convenience
 export const filtersAtom = atom(
-  (get) => ({
-    showMovers: get(showMoversAtom),
-    showVolatility: get(showVolatilityAtom),
-    showRatios: get(showRatiosAtom),
-    showFutures: get(showFuturesAtom),
-    showAvat: get(showAvatAtom),
-    show10D: get(show10DAtom),
-    showYTD: get(showYTDAtom),
-    showCAD: get(showCADAtom),
-  } as FilterState)
+  (get) =>
+    ({
+      showMovers: get(showMoversAtom),
+      showVolatility: get(showVolatilityAtom),
+      showRatios: get(showRatiosAtom),
+      showFutures: get(showFuturesAtom),
+      showAvat: get(showAvatAtom),
+      show10D: get(show10DAtom),
+      showYTD: get(showYTDAtom),
+      showCAD: get(showCADAtom),
+    }) as FilterState
 );
 
 // Market data atoms

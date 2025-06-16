@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useRef } from "react";
 import { fetchMarketData, simulateMarketUpdate } from "../api/market-data";
-import type { MarketData, MarketItem } from "../types";
 import {
   dataSourceAtom,
   isFromRedisAtom,
@@ -13,6 +12,7 @@ import {
   updatedCellsAtom,
   updatedSparklinesAtom,
 } from "../atoms";
+import type { MarketData, MarketItem } from "../types";
 
 // Query keys
 export const MARKET_DATA_KEY = "marketData";
@@ -71,7 +71,13 @@ export function useMarketDataQuery() {
 
     // Compare with previous data to highlight changes
     ["americas", "emea", "asiaPacific"].forEach((region) => {
-      if (!oldData[region] || !newData[region] || !Array.isArray(oldData[region]) || !Array.isArray(newData[region])) return;
+      if (
+        !oldData[region] ||
+        !newData[region] ||
+        !Array.isArray(oldData[region]) ||
+        !Array.isArray(newData[region])
+      )
+        return;
 
       (oldData[region] as MarketItem[]).forEach((oldItem: MarketItem, index: number) => {
         const newItem = newData[region]?.[index];

@@ -91,12 +91,12 @@
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: none;
   }
-  
+
   body.dark {
     background-color: #121212;
     color: white;
   }
-  
+
   body.light {
     background-color: #f0f0f0;
     color: black;

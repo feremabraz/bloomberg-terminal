@@ -19,15 +19,15 @@ export function isSignificantMover(item: MarketItem, threshold = 1.5): boolean {
  * @returns Boolean indicating if the security has high volatility
  */
 export function hasHighVolatility(
-  item: MarketItem, 
-  volatilityData: Record<string, number> = {}, 
+  item: MarketItem,
+  volatilityData: Record<string, number> = {},
   threshold = 2.0
 ): boolean {
   // If we have volatility data for this security, use it
   if (volatilityData[item.id]) {
     return volatilityData[item.id] >= threshold;
   }
-  
+
   // Otherwise, use a simple heuristic based on price change
   // This is a simplified approach - real systems would use standard deviation of returns
   return Math.abs(item.change) >= threshold;
@@ -49,7 +49,7 @@ export function sortByAbsoluteChange(items: MarketItem[]): MarketItem[] {
  * @returns Filtered array with only significant movers
  */
 export function filterSignificantMovers(items: MarketItem[], threshold = 1.5): MarketItem[] {
-  return items.filter(item => isSignificantMover(item, threshold));
+  return items.filter((item) => isSignificantMover(item, threshold));
 }
 
 /**

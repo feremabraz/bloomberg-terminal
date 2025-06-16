@@ -19,7 +19,7 @@ export async function fetchAllMarketData(): Promise<MarketData> {
  */
 export async function fetchRegionMarketData(region: string): Promise<MarketItem[]> {
   const allData = await fetchAllMarketData();
-  return allData[region] as MarketItem[] || [];
+  return (allData[region] as MarketItem[]) || [];
 }
 
 /**
@@ -28,16 +28,16 @@ export async function fetchRegionMarketData(region: string): Promise<MarketItem[
  */
 export async function fetchMarketItemById(id: string): Promise<MarketItem | null> {
   const allData = await fetchAllMarketData();
-  
+
   // Search through all regions for the item with matching ID
   for (const region of ["americas", "emea", "asiaPacific"]) {
     const items = allData[region] as MarketItem[];
     if (!items) continue;
-    
-    const item = items.find(item => item.id === id);
+
+    const item = items.find((item) => item.id === id);
     if (item) return item;
   }
-  
+
   return null;
 }
 
@@ -47,20 +47,20 @@ export async function fetchMarketItemById(id: string): Promise<MarketItem | null
 export async function fetchMarketMovers(): Promise<MarketItem[]> {
   const allData = await fetchAllMarketData();
   const movers: MarketItem[] = [];
-  
+
   // Collect items with significant price changes from all regions
   for (const region of ["americas", "emea", "asiaPacific"]) {
     const items = allData[region] as MarketItem[];
     if (!items) continue;
-    
+
     // Consider an item a "mover" if its percentage change is significant
     const significantMovers = items.filter(
-      item => Math.abs(item.pctChange) > 1.0 // More than 1% change
+      (item) => Math.abs(item.pctChange) > 1.0 // More than 1% change
     );
-    
+
     movers.push(...significantMovers);
   }
-  
+
   // Sort by absolute percentage change (descending)
   return movers.sort((a, b) => Math.abs(b.pctChange) - Math.abs(a.pctChange));
 }
@@ -71,17 +71,17 @@ export async function fetchMarketMovers(): Promise<MarketItem[]> {
 export async function fetchVolatileMarkets(): Promise<MarketItem[]> {
   const allData = await fetchAllMarketData();
   const volatileItems: MarketItem[] = [];
-  
+
   // Collect items with high volatility from all regions
   for (const region of ["americas", "emea", "asiaPacific"]) {
     const items = allData[region] as MarketItem[];
     if (!items) continue;
-    
+
     // Use avat (Average Trading Volume) as a proxy for volatility
-    const highVolatilityItems = items.filter(item => item.avat > 1.5);
+    const highVolatilityItems = items.filter((item) => item.avat > 1.5);
     volatileItems.push(...highVolatilityItems);
   }
-  
+
   // Sort by volatility (descending)
   return volatileItems.sort((a, b) => b.avat - a.avat);
 }

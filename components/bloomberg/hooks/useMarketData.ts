@@ -1,23 +1,17 @@
 "use client";
 
-import { 
-  useQuery, 
-  useQueries, 
-  useQueryClient,
-  useMutation,
-} from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { 
-  fetchAllMarketData, 
-  fetchRegionMarketData,
+import {
+  fetchAllMarketData,
   fetchMarketItemById,
   fetchMarketMovers,
+  fetchRegionMarketData,
   fetchVolatileMarkets,
-  refreshMarketData
+  refreshMarketData,
 } from "../api/market-data-api";
 import { queryKeys } from "../api/query-keys";
-import type { MarketData, MarketItem } from "../types";
 import {
   dataSourceAtom,
   isFromRedisAtom,
@@ -26,6 +20,7 @@ import {
   updatedCellsAtom,
   updatedSparklinesAtom,
 } from "../atoms";
+import type { MarketData, MarketItem } from "../types";
 
 /**
  * Hook for fetching all market data
@@ -35,7 +30,7 @@ export function useAllMarketData() {
   const [, setLastUpdated] = useAtom(lastUpdatedAtom);
   const [, setDataSource] = useAtom(dataSourceAtom);
   const [, setIsFromRedis] = useAtom(isFromRedisAtom);
-  
+
   const queryClient = useQueryClient();
 
   // Main query for all market data
@@ -47,17 +42,17 @@ export function useAllMarketData() {
     refetchOnWindowFocus: false,
     gcTime: 3600000, // 1 hour
   });
-  
+
   // Update atoms when data changes
   useEffect(() => {
     if (marketDataQuery.data) {
       // Update Jotai atoms with metadata
       setLastUpdated(new Date());
-      
+
       if (marketDataQuery.data.source) {
         setDataSource(marketDataQuery.data.source as string);
       }
-      
+
       if (marketDataQuery.data.fromRedis !== undefined) {
         setIsFromRedis(marketDataQuery.data.fromRedis as boolean);
       }
@@ -70,16 +65,16 @@ export function useAllMarketData() {
     onSuccess: () => {
       // Invalidate and refetch all market data related queries
       queryClient.invalidateQueries({
-        queryKey: queryKeys.marketData.all
+        queryKey: queryKeys.marketData.all,
       });
       // Also invalidate derived queries
       queryClient.invalidateQueries({
-        queryKey: queryKeys.marketMovers.all
+        queryKey: queryKeys.marketMovers.all,
       });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.volatility.all
+        queryKey: queryKeys.volatility.all,
       });
-    }
+    },
   });
 
   // Toggle real-time updates
@@ -93,19 +88,24 @@ export function useAllMarketData() {
   const refreshData = useCallback(() => {
     return refreshMutation.mutate();
   }, [refreshMutation]);
-  
+
   // Create a selector for specific market data regions
-  const getRegionData = useCallback((region: string) => {
-    if (!marketDataQuery.data) return [];
-    return marketDataQuery.data[region] as MarketItem[] || [];
-  }, [marketDataQuery.data]);
+  const getRegionData = useCallback(
+    (region: string) => {
+      if (!marketDataQuery.data) return [];
+      return (marketDataQuery.data[region] as MarketItem[]) || [];
+    },
+    [marketDataQuery.data]
+  );
 
   return {
     marketData: marketDataQuery.data,
     isLoading: marketDataQuery.isPending,
     isRefetching: marketDataQuery.isRefetching,
     error: marketDataQuery.error,
-    dataUpdatedAt: marketDataQuery.dataUpdatedAt ? new Date(marketDataQuery.dataUpdatedAt) : new Date(),
+    dataUpdatedAt: marketDataQuery.dataUpdatedAt
+      ? new Date(marketDataQuery.dataUpdatedAt)
+      : new Date(),
     isRealTimeEnabled,
     toggleRealTimeUpdates,
     refreshData,
@@ -118,10 +118,10 @@ export function useAllMarketData() {
  */
 export function useRegionMarketData(regions: string[] = ["americas", "emea", "asiaPacific"]) {
   const [isRealTimeEnabled] = useAtom(isRealTimeEnabledAtom);
-  
+
   // Use useQueries for multiple related queries
   const regionsQueries = useQueries({
-    queries: regions.map(region => ({
+    queries: regions.map((region) => ({
       queryKey: queryKeys.marketData.region(region),
       queryFn: () => fetchRegionMarketData(region),
       refetchInterval: isRealTimeEnabled ? 30000 : 300000,
@@ -131,27 +131,27 @@ export function useRegionMarketData(regions: string[] = ["americas", "emea", "as
     })),
     combine: (results) => {
       return {
-        data: results.map(result => result.data),
-        pending: results.some(result => result.isPending),
-        isError: results.some(result => result.isError),
-        error: results.find(result => result.error)?.error
-      }
-    }
+        data: results.map((result) => result.data),
+        pending: results.some((result) => result.isPending),
+        isError: results.some((result) => result.isError),
+        error: results.find((result) => result.error)?.error,
+      };
+    },
   });
 
   // Combine the results into a single object
   const combinedData = useMemo(() => {
     const result: Partial<MarketData> = {};
-    
+
     // Access the data array from the combined results
     const dataArray = regionsQueries.data;
-    
+
     regions.forEach((region, index) => {
       if (dataArray?.[index]) {
         result[region] = dataArray[index];
       }
     });
-    
+
     return result as MarketData;
   }, [regions, regionsQueries]);
 
@@ -174,7 +174,7 @@ export function useRegionMarketData(regions: string[] = ["americas", "emea", "as
 export function useMarketMovers() {
   const [isRealTimeEnabled] = useAtom(isRealTimeEnabledAtom);
   const queryClient = useQueryClient();
-  
+
   // First check if we already have market data in the cache
   const marketDataQuery = useQuery({
     queryKey: queryKeys.marketMovers.list(),
@@ -184,7 +184,7 @@ export function useMarketMovers() {
     refetchOnWindowFocus: false,
     gcTime: 3600000,
   });
-  
+
   return marketDataQuery;
 }
 
@@ -194,7 +194,7 @@ export function useMarketMovers() {
 export function useVolatileMarkets() {
   const [isRealTimeEnabled] = useAtom(isRealTimeEnabledAtom);
   const queryClient = useQueryClient();
-  
+
   const volatilityQuery = useQuery({
     queryKey: queryKeys.volatility.list(),
     queryFn: fetchVolatileMarkets,
@@ -203,7 +203,7 @@ export function useVolatileMarkets() {
     refetchOnWindowFocus: false,
     gcTime: 3600000,
   });
-  
+
   return volatilityQuery;
 }
 
@@ -212,7 +212,7 @@ export function useVolatileMarkets() {
  */
 export function useMarketItem(id: string) {
   const [isRealTimeEnabled] = useAtom(isRealTimeEnabledAtom);
-  
+
   const itemQuery = useQuery({
     queryKey: queryKeys.marketData.detail(id),
     queryFn: () => fetchMarketItemById(id),
@@ -223,7 +223,7 @@ export function useMarketItem(id: string) {
     // Only fetch if we have an ID
     enabled: !!id,
   });
-  
+
   return itemQuery;
 }
 
@@ -235,53 +235,58 @@ export function useMarketDataUpdates() {
   const queryClient = useQueryClient();
   const [updatedCells, setUpdatedCells] = useAtom(updatedCellsAtom);
   const [updatedSparklines, setUpdatedSparklines] = useAtom(updatedSparklinesAtom);
-  
+
   // Get the current market data from the query cache
   const currentData = queryClient.getQueryData<MarketData>(queryKeys.marketData.list());
-  
+
   // Track previous data with a ref
   const previousDataRef = useRef<MarketData | undefined>(undefined);
-  
+
   // Update previous data ref when current data changes
   useEffect(() => {
     if (currentData && currentData !== previousDataRef.current) {
       previousDataRef.current = structuredClone(currentData);
     }
   }, [currentData]);
-  
+
   const previousData = previousDataRef.current;
-  
+
   // Calculate updates whenever the data changes
   useMemo(() => {
     if (!currentData || !previousData || currentData === previousData) {
       return;
     }
-    
+
     const newUpdatedCells: Record<string, boolean> = {};
     const newUpdatedSparklines: Record<string, boolean> = {};
-    
+
     // Compare with previous data to highlight changes
     ["americas", "emea", "asiaPacific"].forEach((region) => {
       if (!previousData || !currentData) return;
-      
+
       const prevRegionData = previousData[region] as MarketItem[] | undefined;
       const currRegionData = currentData[region] as MarketItem[] | undefined;
-      
-      if (!prevRegionData || !currRegionData || 
-          !Array.isArray(prevRegionData) || !Array.isArray(currRegionData)) return;
-      
+
+      if (
+        !prevRegionData ||
+        !currRegionData ||
+        !Array.isArray(prevRegionData) ||
+        !Array.isArray(currRegionData)
+      )
+        return;
+
       prevRegionData.forEach((oldItem: MarketItem, index: number) => {
         const newItem = currRegionData[index];
         if (newItem && oldItem) {
           // Check all fields for changes
           const fieldsToCheck = ["value", "change", "pctChange", "avat", "time", "ytd", "ytdCur"];
-          
+
           fieldsToCheck.forEach((field) => {
             if (oldItem[field as keyof MarketItem] !== newItem[field as keyof MarketItem]) {
               newUpdatedCells[`${region}-${newItem.id}-${field}`] = true;
             }
           });
-          
+
           // Check if sparkline data has changed
           if (JSON.stringify(oldItem.sparkline1) !== JSON.stringify(newItem.sparkline1)) {
             newUpdatedSparklines[`${region}-${newItem.id}`] = true;
@@ -289,17 +294,17 @@ export function useMarketDataUpdates() {
         }
       });
     });
-    
+
     // Only update atoms if there are actual changes
     if (Object.keys(newUpdatedCells).length > 0) {
       setUpdatedCells(newUpdatedCells);
     }
-    
+
     if (Object.keys(newUpdatedSparklines).length > 0) {
       setUpdatedSparklines(newUpdatedSparklines);
     }
   }, [currentData, previousData, setUpdatedCells, setUpdatedSparklines]);
-  
+
   return {
     updatedCells,
     updatedSparklines,
@@ -311,27 +316,27 @@ export function useMarketDataUpdates() {
  * This is used to provide a single hook for all market data
  */
 export function useMarketDataQuery() {
-  const { 
-    marketData, 
-    isLoading, 
-    error, 
+  const {
+    marketData,
+    isLoading,
+    error,
     dataUpdatedAt,
     isRealTimeEnabled,
     toggleRealTimeUpdates,
     refreshData,
-    getRegionData 
+    getRegionData,
   } = useAllMarketData();
-  
+
   const { updatedCells, updatedSparklines } = useMarketDataUpdates();
   const [lastUpdated] = useAtom(lastUpdatedAtom);
   const [dataSource] = useAtom(dataSourceAtom);
   const [isFromRedis] = useAtom(isFromRedisAtom);
-  
+
   // Create selectors for specific data views
-  const getAmericasData = useCallback(() => getRegionData('americas'), [getRegionData]);
-  const getEmeaData = useCallback(() => getRegionData('emea'), [getRegionData]);
-  const getAsiaPacificData = useCallback(() => getRegionData('asiaPacific'), [getRegionData]);
-  
+  const getAmericasData = useCallback(() => getRegionData("americas"), [getRegionData]);
+  const getEmeaData = useCallback(() => getRegionData("emea"), [getRegionData]);
+  const getAsiaPacificData = useCallback(() => getRegionData("asiaPacific"), [getRegionData]);
+
   return {
     marketData,
     isLoading,

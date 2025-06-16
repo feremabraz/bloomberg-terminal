@@ -1,0 +1,18 @@
+#!/bin/sh
+echo "🚀 Running pre-push checks..."
+
+# Check for bypass flag
+if [ "$SKIP_HOOKS" = "1" ] || [ "$BYPASS_PUSH_PROTECTION" = "1" ]; then
+  echo "⚠️ Bypassing pre-push protection (BYPASS_PUSH_PROTECTION=1)"
+  exit 0
+fi
+
+# Prevent pushing to main/master directly
+current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+if [ "$current_branch" = "main" ] || [ "$current_branch" = "master" ]; then
+  echo "❌ Direct push to $current_branch is not allowed. Use a feature branch."
+  echo "💡 To bypass: BYPASS_PUSH_PROTECTION=1 git push"
+  exit 1
+fi
+
+echo "✅ Pre-push checks passed!"

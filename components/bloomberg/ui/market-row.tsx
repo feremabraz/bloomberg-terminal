@@ -3,23 +3,23 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useAtom } from "jotai";
 import { SparklineCell } from ".";
-import { bloombergColors, cn } from "../lib/theme-config";
-import { convertToCAD, formatCurrency } from "../lib/currency-utils";
-import { 
-  currentViewAtom, 
-  rmiSelectedRegionAtom, 
-  rmiSelectedSecurityAtom, 
-  rmiBenchmarkIndexAtom,
+import {
+  currentViewAtom,
   filtersAtom,
-  showCADAtom,
-  showYTDAtom,
-  showAvatAtom,
+  rmiBenchmarkIndexAtom,
+  rmiSelectedRegionAtom,
+  rmiSelectedSecurityAtom,
   show10DAtom,
+  showAvatAtom,
+  showCADAtom,
+  showFuturesAtom,
   showMoversAtom,
-  showVolatilityAtom,
   showRatiosAtom,
-  showFuturesAtom
+  showVolatilityAtom,
+  showYTDAtom,
 } from "../atoms";
+import { convertToCAD, formatCurrency } from "../lib/currency-utils";
+import { bloombergColors, cn } from "../lib/theme-config";
 import type { MarketItem } from "../types";
 
 type MarketRowProps = {
@@ -47,18 +47,18 @@ export function MarketRow({
   const [showVolatility] = useAtom(showVolatilityAtom);
   const [showRatios] = useAtom(showRatiosAtom);
   const [showFutures] = useAtom(showFuturesAtom);
-  
+
   // Use Jotai atoms for navigation
   const [, setCurrentView] = useAtom(currentViewAtom);
   const [, setSelectedRegion] = useAtom(rmiSelectedRegionAtom);
   const [, setSelectedSecurity] = useAtom(rmiSelectedSecurityAtom);
   const [, setBenchmarkIndex] = useAtom(rmiBenchmarkIndexAtom);
-  
+
   // Note: Filtering is now handled at the section level in market-section.tsx
-  
+
   const colors = isDarkMode ? bloombergColors.dark : bloombergColors.light;
   const fixedColumnClass = "w-[120px] sm:w-[140px] whitespace-nowrap overflow-hidden text-ellipsis";
-  
+
   // Handle RMI cell click to navigate to RMI view
   const handleRmiClick = () => {
     // Set the region based on the current row's region
@@ -69,11 +69,11 @@ export function MarketRow({
     } else if (region === "asiapacific") {
       setSelectedRegion("asiaPacific");
     }
-    
+
     // Set the selected security and default benchmark
     setSelectedSecurity(item.id);
     setBenchmarkIndex("SPX:IND"); // Default benchmark
-    
+
     // Navigate to RMI view
     setCurrentView("rmi");
   };
@@ -88,7 +88,7 @@ export function MarketRow({
           <span className={`text-[${colors.accent}] text-xs`}>{item.id}</span>
         </div>
       </TableCell>
-      <TableCell 
+      <TableCell
         className="px-2 py-1 text-center text-xs cursor-pointer hover:underline"
         style={{ color: colors.accent }}
         onClick={handleRmiClick}
@@ -127,20 +127,25 @@ export function MarketRow({
         className={cn(
           "px-2 py-1 text-right text-xs",
           showYTD
-            ? item.ytd > 0 ? `text-[${colors.positive}]` : `text-[${colors.negative}]`
-            : item.change > 0 ? `text-[${colors.positive}]` : `text-[${colors.negative}]`,
+            ? item.ytd > 0
+              ? `text-[${colors.positive}]`
+              : `text-[${colors.negative}]`
+            : item.change > 0
+              ? `text-[${colors.positive}]`
+              : `text-[${colors.negative}]`,
           updatedCells[`${region}-${item.id}-change`] &&
             "bg-yellow-300 dark:bg-yellow-900 transition-colors duration-500"
         )}
       >
         {showYTD ? (
           <span title={`Daily change: ${item.change > 0 ? "+" : ""}${item.change.toFixed(2)}`}>
-            {item.ytd > 0 ? "+" : ""}{item.ytd.toFixed(2)}%
+            {item.ytd > 0 ? "+" : ""}
+            {item.ytd.toFixed(2)}%
           </span>
+        ) : typeof item.change === "number" ? (
+          (item.change > 0 ? "+" : "") + item.change.toFixed(2)
         ) : (
-          typeof item.change === "number"
-            ? (item.change > 0 ? "+" : "") + item.change.toFixed(2)
-            : "N/A"
+          "N/A"
         )}
       </TableCell>
       <TableCell
@@ -156,7 +161,7 @@ export function MarketRow({
       </TableCell>
       <TableCell
         className={cn(
-          `px-2 py-1 text-right text-xs ${item.avat > 0 ? `text-[${colors.positive}]` : `text-[${colors.negative}]`} ${showAvat ? 'sm:table-cell' : 'hidden'}`,
+          `px-2 py-1 text-right text-xs ${item.avat > 0 ? `text-[${colors.positive}]` : `text-[${colors.negative}]`} ${showAvat ? "sm:table-cell" : "hidden"}`,
           updatedCells[`${region}-${item.id}-avat`] &&
             "bg-yellow-300 dark:bg-yellow-900 transition-colors duration-500"
         )}
