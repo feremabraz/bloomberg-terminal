@@ -111,12 +111,35 @@ export default function NewsView({ isDarkMode, onBack }: NewsViewProps) {
 
   // Format the published time
   const formatPublishedTime = (timeString: string) => {
-    try {
-      const date = new Date(timeString);
-      return date.toLocaleString();
-    } catch (e) {
-      return timeString;
+    // The Alpha Vantage API returns dates in YYYYMMDDTHHMMSS format.
+    // We need to parse this custom format, as new Date() cannot handle it directly.
+    const alphaVantageFormat = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})$/;
+    const match = timeString.match(alphaVantageFormat);
+
+    let date: Date;
+    if (match) {
+      // If it matches the Alpha Vantage format, parse it manually.
+      const [, year, month, day, hour, minute, second] = match;
+      // Note: The month is 0-indexed in the JavaScript Date constructor (0-11).
+      date = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        Number(hour),
+        Number(minute),
+        Number(second)
+      );
+    } else {
+      // Otherwise, assume it's a standard format (like the ISO 8601 string from our fallback data).
+      date = new Date(timeString);
     }
+
+    // Check if the resulting date is valid before formatting.
+    if (Number.isNaN(date.getTime())) {
+      return "Invalid Date";
+    }
+
+    return date.toLocaleString();
   };
 
   // Initial news fetch
