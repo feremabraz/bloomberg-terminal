@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Activity,
   AlertTriangle,
   BarChart2,
   Database,
@@ -11,7 +12,6 @@ import {
   Sun,
   TrendingUp,
   Wifi,
-  Activity,
 } from "lucide-react";
 import { BloombergButton } from "../core/bloomberg-button";
 import { useMarketDataQuery } from "../hooks";
@@ -110,7 +110,6 @@ export function TerminalHeader({
         <Activity className="h-3 w-3 mr-1" />
         RMI
       </BloombergButton>
-      <BloombergButton color="green">RATC</BloombergButton>
 
       <BloombergButton color="accent" onClick={onHelpClick}>
         <HelpCircle className="h-3 w-3 mr-1" />
