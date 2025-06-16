@@ -1,9 +1,9 @@
 import { marketData as fallbackData } from "@/components/bloomberg/lib/marketData";
+import type { MarketData, MarketItem } from "@/components/bloomberg/types";
 import { generateRandomSparkline } from "@/lib/alpha-vantage";
 import refreshMarketData from "@/lib/market-data-refresh";
 import { redis } from "@/lib/redis";
 import { NextResponse } from "next/server";
-import type { MarketData, MarketItem } from "@/components/bloomberg/types";
 
 // Initialize the market data refresh scheduler
 // This is imported here so it starts when the API route is first loaded
@@ -19,9 +19,9 @@ const SPARKLINE_UPDATE_INTERVAL = 5 * 60 * 1000;
 function initializeYearStartValues(data: MarketData) {
   if (Object.keys(yearStartValues).length === 0) {
     // For each market index, set a year start value that makes sense with current values and YTD
-    Object.keys(data).forEach((region) => {
+    for (const region of Object.keys(data)) {
       if (region === "americas" || region === "emea" || region === "asiaPacific") {
-        data[region].forEach((item: MarketItem) => {
+        for (const item of data[region]) {
           // Calculate what the year start value would have been based on current value and YTD
           // YTD = (current - yearStart) / yearStart * 100
           // So yearStart = current / (1 + YTD/100)
@@ -30,9 +30,9 @@ function initializeYearStartValues(data: MarketData) {
           } else {
             yearStartValues[item.id] = item.value * 0.9; // Fallback: assume 10% growth
           }
-        });
+        }
       }
-    });
+    }
     console.log("Year start values initialized");
   }
 }

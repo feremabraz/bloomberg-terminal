@@ -76,21 +76,21 @@ export default function MarketMoversView({
     const allIndices: MarketIndex[] = [];
 
     if (marketData.americas) {
-      marketData.americas.forEach((index) => {
+      for (const index of marketData.americas) {
         allIndices.push({ ...index, region: "Americas" });
-      });
+      }
     }
 
     if (marketData.emea) {
-      marketData.emea.forEach((index) => {
+      for (const index of marketData.emea) {
         allIndices.push({ ...index, region: "EMEA" });
-      });
+      }
     }
 
     if (marketData.asiaPacific) {
-      marketData.asiaPacific.forEach((index) => {
+      for (const index of marketData.asiaPacific) {
         allIndices.push({ ...index, region: "Asia/Pacific" });
-      });
+      }
     }
 
     // Filter based on selected criteria

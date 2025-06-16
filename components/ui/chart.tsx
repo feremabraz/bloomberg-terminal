@@ -75,16 +75,16 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
   // Update the ref value
   cssVariablesRef.current = {};
-  Object.entries(THEMES).forEach(([theme, prefix]) => {
+  for (const [theme, prefix] of Object.entries(THEMES)) {
     cssVariablesRef.current[theme] = {};
 
-    colorConfig.forEach(([key, itemConfig]) => {
+    for (const [key, itemConfig] of colorConfig) {
       const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
       if (color) {
         cssVariablesRef.current[theme][`--color-${key}`] = color;
       }
-    });
-  });
+    }
+  }
 
   // Apply the CSS variables directly to the data-chart element
   React.useEffect(() => {
@@ -93,11 +93,11 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
       const isDark = document.documentElement.classList.contains("dark");
       const theme = isDark ? "dark" : "light";
 
-      chartElements.forEach((element) => {
-        Object.entries(cssVariablesRef.current[theme] || {}).forEach(([variable, value]) => {
+      for (const element of chartElements) {
+        for (const [variable, value] of Object.entries(cssVariablesRef.current[theme] || {})) {
           (element as HTMLElement).style.setProperty(variable, value as string);
-        });
-      });
+        }
+      }
     };
 
     // Apply styles immediately
@@ -105,11 +105,11 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
     // Set up a mutation observer to watch for theme changes
     const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+      for (const mutation of mutations) {
         if (mutation.attributeName === "class" && mutation.target === document.documentElement) {
           applyStyles();
         }
-      });
+      }
     });
 
     observer.observe(document.documentElement, { attributes: true });

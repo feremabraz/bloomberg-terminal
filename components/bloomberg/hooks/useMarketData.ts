@@ -261,8 +261,8 @@ export function useMarketDataUpdates() {
     const newUpdatedSparklines: Record<string, boolean> = {};
 
     // Compare with previous data to highlight changes
-    ["americas", "emea", "asiaPacific"].forEach((region) => {
-      if (!previousData || !currentData) return;
+    for (const region of ["americas", "emea", "asiaPacific"]) {
+      if (!previousData || !currentData) continue;
 
       const prevRegionData = previousData[region] as MarketItem[] | undefined;
       const currRegionData = currentData[region] as MarketItem[] | undefined;
@@ -273,27 +273,27 @@ export function useMarketDataUpdates() {
         !Array.isArray(prevRegionData) ||
         !Array.isArray(currRegionData)
       )
-        return;
+        continue;
 
-      prevRegionData.forEach((oldItem: MarketItem, index: number) => {
+      for (const [index, oldItem] of prevRegionData.entries()) {
         const newItem = currRegionData[index];
         if (newItem && oldItem) {
           // Check all fields for changes
           const fieldsToCheck = ["value", "change", "pctChange", "avat", "time", "ytd", "ytdCur"];
 
-          fieldsToCheck.forEach((field) => {
+          for (const field of fieldsToCheck) {
             if (oldItem[field as keyof MarketItem] !== newItem[field as keyof MarketItem]) {
               newUpdatedCells[`${region}-${newItem.id}-${field}`] = true;
             }
-          });
+          }
 
           // Check if sparkline data has changed
           if (JSON.stringify(oldItem.sparkline1) !== JSON.stringify(newItem.sparkline1)) {
             newUpdatedSparklines[`${region}-${newItem.id}`] = true;
           }
         }
-      });
-    });
+      }
+    }
 
     // Only update atoms if there are actual changes
     if (Object.keys(newUpdatedCells).length > 0) {

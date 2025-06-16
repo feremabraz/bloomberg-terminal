@@ -73,13 +73,19 @@ export default function BloombergTerminal() {
   const allMarketIndices = useCallback(() => {
     const indices: string[] = [];
     if (data?.americas) {
-      data.americas.forEach((item: MarketItem) => indices.push(item.id));
+      for (const item of data.americas) {
+        indices.push(item.id);
+      }
     }
     if (data?.emea) {
-      data.emea.forEach((item: MarketItem) => indices.push(item.id));
+      for (const item of data.emea) {
+        indices.push(item.id);
+      }
     }
     if (data?.asiaPacific) {
-      data.asiaPacific.forEach((item: MarketItem) => indices.push(item.id));
+      for (const item of data.asiaPacific) {
+        indices.push(item.id);
+      }
     }
     return indices;
   }, [data]);

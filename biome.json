@@ -6,22 +6,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
-      "correctness": {
-        "useExhaustiveDependencies": "warn"
-      },
-      "suspicious": {
-        "noExplicitAny": "warn"
-      },
-      "complexity": {
-        "noForEach": "off"
-      },
-      "style": {
-        "noNonNullAssertion": "off"
-      },
-      "a11y": {
-        "useKeyWithClickEvents": "error"
-      }
+      "recommended": true
     },
     "ignore": ["node_modules/**", ".next/**", "public/**"]
   },

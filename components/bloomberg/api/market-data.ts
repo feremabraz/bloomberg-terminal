@@ -30,10 +30,10 @@ export async function simulateMarketUpdate(currentData: MarketData) {
   // Simulate random changes to market values
   const regions = ["americas", "emea", "asiaPacific"];
 
-  regions.forEach((region) => {
-    if (!updatedData[region]) return;
+  for (const region of regions) {
+    if (!updatedData[region]) continue;
 
-    updatedData[region].forEach((item: MarketItem) => {
+    for (const item of updatedData[region]) {
       // Randomly decide if this item should be updated (20% chance)
       if (Math.random() < 0.2) {
         // Generate a small random change
@@ -52,8 +52,8 @@ export async function simulateMarketUpdate(currentData: MarketData) {
         // Update timestamp
         item.time = new Date().toLocaleTimeString();
       }
-    });
-  });
+    }
+  }
 
   return updatedData;
 }

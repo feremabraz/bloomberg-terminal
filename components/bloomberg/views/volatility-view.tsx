@@ -90,7 +90,7 @@ export default function VolatilityView({
 
       // Process Americas
       if (marketData.americas) {
-        marketData.americas.forEach((index) => {
+        for (const index of marketData.americas) {
           // Generate realistic volatility metrics based on existing data
           const historicalVol = generateHistoricalVolatility(index);
           const impliedVol = historicalVol * (1 + (Math.random() * 0.4 - 0.2)); // IV is usually close to HV but can vary
@@ -118,12 +118,12 @@ export default function VolatilityView({
             change: index.change,
             pctChange: index.pctChange,
           });
-        });
+        }
       }
 
       // Process EMEA
       if (marketData.emea) {
-        marketData.emea.forEach((index) => {
+        for (const index of marketData.emea) {
           const historicalVol = generateHistoricalVolatility(index);
           const impliedVol = historicalVol * (1 + (Math.random() * 0.4 - 0.2));
           const volRatio = historicalVol / (10 + Math.random() * 5);
@@ -150,12 +150,12 @@ export default function VolatilityView({
             change: index.change,
             pctChange: index.pctChange,
           });
-        });
+        }
       }
 
       // Process Asia/Pacific
       if (marketData.asiaPacific) {
-        marketData.asiaPacific.forEach((index) => {
+        for (const index of marketData.asiaPacific) {
           const historicalVol = generateHistoricalVolatility(index);
           const impliedVol = historicalVol * (1 + (Math.random() * 0.4 - 0.2));
           const volRatio = historicalVol / (10 + Math.random() * 5);
@@ -182,7 +182,7 @@ export default function VolatilityView({
             change: index.change,
             pctChange: index.pctChange,
           });
-        });
+        }
       }
 
       return result;
